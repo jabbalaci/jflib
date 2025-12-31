@@ -8,6 +8,7 @@ program test_jstringbuffer
    call test_join()
    call test_clear()
    call test_equals()
+   call test_get()
 
    print '(a)', "OK"
 
@@ -100,6 +101,17 @@ contains
       call assert_false(a%equals(b))
       call b%clear()
       call assert_true(a%equals(b))
+   end subroutine
+
+   subroutine test_get()
+      type(StringBuffer) :: sb
+
+      call sb%append("aa")
+      call sb%append("bb")
+      call sb%append("cc")
+      call assert(sb%get(1) == "aa")
+      call assert(sb%get(2) == "bb")
+      call assert(sb%get(3) == "cc")
    end subroutine
 
 end program

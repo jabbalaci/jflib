@@ -3,6 +3,7 @@ module jstringbuffer
 ! A stringbuffer for storing variable-length strings.
 
    use jtypes, only: String
+   use jassert, only: assert
    implicit none
    private
    integer, parameter :: INITIAL_CAPACITY = 8
@@ -15,7 +16,7 @@ module jstringbuffer
       type(String), private, allocatable :: data(:)
    contains
       procedure :: append, debug, number_of_elems, total_length, join, to_string, &
-         equals, clear
+         equals, clear, get
    end type StringBuffer
 
 contains
@@ -76,9 +77,19 @@ contains
       integer :: i
 
       do i = 1, self%size
-         print *, "'", self%data(i)%s, "'"
+         print '(*(g0))', i, ": ", "'", self%data(i)%s, "'"
       end do
    end subroutine
+
+   function get(self, i) result(result)
+      !# Returns the string at position `i`
+      class(StringBuffer), intent(in) :: self
+      integer, intent(in) :: i
+      character(len=:), allocatable :: result
+
+      call assert(1 <= i .and. i <= self%size, "IndexError: index out of range")
+      result = self%data(i)%s
+   end function
 
    function to_string(self) result(result)
       !# Get the content of the stringbuffer as a string.

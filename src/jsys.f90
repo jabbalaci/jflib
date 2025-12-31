@@ -8,11 +8,18 @@ module jsys
    implicit none
    private
 
-   public :: argv, stdin, stdout, stderr
+   public :: argc, argv, stdin, stdout, stderr
 
 contains
 
-   !# argc: command_argument_count()
+   function argc() result(result)
+      !# Number of command-line arguments provided by the user.
+      !# $ ./a.out                    # argc() returns 0
+      !# $ ./a.out hello              # argc() returns 1
+      integer :: result
+
+      result = command_argument_count()
+   end function
 
    function argv(idx) result(result)
       !# Returns the i^{th} command-line argument.
