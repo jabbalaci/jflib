@@ -1,0 +1,17 @@
+Why the .F90 extension?
+=======================
+
+Why .F90 and not the .f90 extension?
+
+With .F90, the CPP pre-processor runs through the code,
+allowing the usage of these macros:
+
+    call assert(to_str(2025) == "2026", "oops", __FILE__, __LINE__)  ! fail
+
+With .f90, we would get an error at these macros: __FILE__, __LINE__
+
+Don't forget to add these lines to fpm.toml:
+
+[preprocess]
+[preprocess.cpp]
+suffixes = [".F90", ".f90"]

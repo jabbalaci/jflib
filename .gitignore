@@ -39,3 +39,12 @@
 
 # debug information files
 *.dwo
+
+
+############
+# My stuff #
+############
+
+.vscode/
+build/
+_foliak/
