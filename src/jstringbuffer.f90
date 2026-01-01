@@ -15,8 +15,9 @@ module jstringbuffer
       integer, private :: capacity = INITIAL_CAPACITY  ! initial capacity
       type(String), private, allocatable :: data(:)
    contains
-      procedure :: append, debug, number_of_elems, total_length, join, to_string, &
-         equals, clear, get
+      procedure, private :: quicksort
+      procedure, public :: append, debug, number_of_elems, total_length, join, to_string, &
+         equals, clear, get, sort, sorted, copy, set, is_sorted, pop, is_empty
    end type StringBuffer
 
 contains
@@ -50,6 +51,13 @@ contains
       class(StringBuffer), intent(in) :: self
       integer :: result
       result = self%size
+   end function
+
+   function is_empty(self) result(result)
+      class(StringBuffer), intent(in) :: self
+      logical :: result
+
+      result = (self%size == 0)
    end function
 
    subroutine append(self, value)
@@ -91,6 +99,17 @@ contains
       result = self%data(i)%s
    end function
 
+   subroutine set(self, i, value)
+      !# Change the value of the i^{th} element to `value`.
+      class(StringBuffer), intent(inout) :: self
+      integer, intent(in) :: i
+      character(len=*), intent(in) :: value
+
+      call assert((1 <= i) .and. (i <= self%size), "IndexError: stringbuffer index out of range")
+
+      self%data(i)%s = value
+   end subroutine
+
    function to_string(self) result(result)
       !# Get the content of the stringbuffer as a string.
       class(StringBuffer), intent(in) :: self
@@ -127,7 +146,7 @@ contains
       if (.not. allocated(self%data)) then
          result = ""
       else
-         extra = max(0, self%number_of_elems() - 1) * len(sep_val)
+         extra = max(0, self%size - 1) * len(sep_val)
          len_alloc = self%total_length() + extra
          ! allocate (character(len=self%total_length() + extra) :: result)  ! compiler error
          allocate (character(len=len_alloc) :: result)  ! it's OK
@@ -155,18 +174,120 @@ contains
       logical :: result
       integer :: i
 
-      if (self%number_of_elems() /= other%number_of_elems()) then
+      if (self%size /= other%size) then
          result = .false.
          return
       end if
       !# else
-      do i = 1, self%number_of_elems()
+      do i = 1, self%size
          if (self%data(i)%s /= other%data(i)%s) then
             result = .false.
             return
          end if
       end do
       result = .true.
+   end function
+
+   recursive subroutine quicksort(self, bal, jobb)  !# private
+      !# Sorts the underlying array in-place with quicksort.
+      class(StringBuffer), intent(inout) :: self
+      integer, intent(in) :: bal, jobb
+      integer :: i, j, pivot_idx
+      type(String) :: x, temp
+
+      if (bal >= jobb) return  !# nothing to sort
+
+      i = bal
+      j = jobb
+      pivot_idx = (bal + jobb) / 2
+      x = self%data(pivot_idx)
+
+      do while (i <= j)
+         do while (self%data(i)%s < x%s)
+            i = i + 1
+         end do
+         do while (self%data(j)%s > x%s)
+            j = j - 1
+         end do
+         if (i <= j) then
+            !# swap elements
+            temp = self%data(i)
+            self%data(i) = self%data(j)
+            self%data(j) = temp
+            i = i + 1
+            j = j - 1
+         end if
+      end do
+
+      if (bal < j) call self%quicksort(bal, j)
+      if (i < jobb) call self%quicksort(i, jobb)
+   end subroutine
+
+   subroutine sort(self)
+      !# sort the underlying array in-place
+      class(StringBuffer), intent(inout) :: self
+      if (self%size == 0) then
+         return
+      end if
+      !# else
+      call self%quicksort(1, self%size)
+   end subroutine
+
+   function sorted(self) result(result)
+      !# Returns a sorted copy of itself. The stringbuffer (self) is NOT modified.
+      class(StringBuffer), intent(in) :: self
+      type(StringBuffer) :: result
+
+      result = self%copy()
+      call result%sort()
+   end function
+
+   function copy(self) result(result)
+      !# Creates and returns an independent copy of itself.
+      class(StringBuffer), intent(in) :: self
+      type(StringBuffer) :: result
+
+      result%size = self%size
+      result%capacity = self%capacity
+      result%data = self%data
+   end function
+
+   function is_sorted(self) result(result)
+      !# Checks if the content of the stringbuffer is sorted or not.
+      !# Returns true or false.
+      class(StringBuffer), intent(in) :: self
+      logical :: result
+      integer :: i
+
+      if (self%size < 2) then
+         result = .true.
+         return
+      end if
+      !# else
+      do i = 2, self%size
+         if (self%data(i - 1)%s > self%data(i)%s) then
+            result = .false.
+            return
+         end if
+      end do
+      result = .true.
+   end function
+
+   function pop(self) result(result)
+      !# Take out and return the last element of the stringbuffer.
+      !# It modifies the stringbuffer!
+      !# TODO: make it possible to take out any element (using an index)
+      class(StringBuffer), intent(inout) :: self
+      character(len=:), allocatable :: result
+
+      call assert(self%size > 0, "Error: the stringbuffer is empty")
+
+      result = self%data(self%size)%s
+      self%data = self%data(1:self%size - 1)
+      self%size = self%size - 1
+      if (self%size == 0) then
+         call self%clear()
+      end if
    end function
 
 end module jstringbuffer
