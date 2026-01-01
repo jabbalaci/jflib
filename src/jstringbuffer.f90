@@ -16,8 +16,11 @@ module jstringbuffer
       type(String), private, allocatable :: data(:)
    contains
       procedure, private :: quicksort
-      procedure, public :: append, debug, number_of_elems, total_length, join, to_string, &
-         equals, clear, get, sort, sorted, copy, set, is_sorted, pop, is_empty
+      procedure, public :: append, debug, stats, number_of_elems, total_length, &
+         to_string, join, &
+         equals, clear, get, sort, sorted, copy, set, is_sorted, pop, is_empty, &
+         contains, add_to_set, get_capacity, set_capacity, last, min_elem, max_elem, &
+         count_elems
    end type StringBuffer
 
 contains
@@ -52,6 +55,27 @@ contains
       integer :: result
       result = self%size
    end function
+
+   function get_capacity(self) result(result)
+      class(StringBuffer), intent(in) :: self
+      integer :: result
+
+      result = self%capacity
+   end function
+
+   subroutine set_capacity(self, new_capacity)
+      !# Increase the capacity of the stringbuffer.
+      !# For advanced usage. If you know that you want to store 1 million elements,
+      !# then you can set a high capacity before the first append.
+      !# With this, you can only increase the capacity. If you want to set a lower
+      !# value than the current capacity, then nothing will happen.
+      class(StringBuffer), intent(inout) :: self
+      integer, intent(in) :: new_capacity
+
+      if (new_capacity > self%capacity) then
+         self%capacity = new_capacity
+      end if
+   end subroutine
 
    function is_empty(self) result(result)
       class(StringBuffer), intent(in) :: self
@@ -89,13 +113,24 @@ contains
       end do
    end subroutine
 
+   subroutine stats(self)
+      !# Print some statistics about the stringbuffer. For debug purposes.
+      class(StringBuffer), intent(in) :: self
+
+      print '(a)', "stats:"
+      print '(*(g0))', " number of elems: ", self%size
+      print '(*(g0))', " capacity: ", self%capacity
+      print '(*(g0))', " total length: ", self%total_length()
+   end subroutine
+
    function get(self, i) result(result)
       !# Returns the string at position `i`
       class(StringBuffer), intent(in) :: self
       integer, intent(in) :: i
       character(len=:), allocatable :: result
 
-      call assert(1 <= i .and. i <= self%size, "IndexError: index out of range")
+      call assert((1 <= i) .and. (i <= self%size), "IndexError: index out of range")
+
       result = self%data(i)%s
    end function
 
@@ -188,18 +223,18 @@ contains
       result = .true.
    end function
 
-   recursive subroutine quicksort(self, bal, jobb)  !# private
+   recursive subroutine quicksort(self, left, right)  !# private
       !# Sorts the underlying array in-place with quicksort.
       class(StringBuffer), intent(inout) :: self
-      integer, intent(in) :: bal, jobb
+      integer, intent(in) :: left, right
       integer :: i, j, pivot_idx
       type(String) :: x, temp
 
-      if (bal >= jobb) return  !# nothing to sort
+      if (left >= right) return  !# nothing to sort
 
-      i = bal
-      j = jobb
-      pivot_idx = (bal + jobb) / 2
+      i = left
+      j = right
+      pivot_idx = (left + right) / 2
       x = self%data(pivot_idx)
 
       do while (i <= j)
@@ -219,8 +254,8 @@ contains
          end if
       end do
 
-      if (bal < j) call self%quicksort(bal, j)
-      if (i < jobb) call self%quicksort(i, jobb)
+      if (left < j) call self%quicksort(left, j)
+      if (i < right) call self%quicksort(i, right)
    end subroutine
 
    subroutine sort(self)
@@ -288,6 +323,89 @@ contains
       if (self%size == 0) then
          call self%clear()
       end if
+   end function
+
+   function contains(self, value) result(result)
+      !# Checks if `value` is in the stringbuffer or not.
+      class(StringBuffer), intent(in) :: self
+      character(len=*), intent(in) :: value
+      logical :: result
+      integer :: i
+
+      do i = 1, self%size
+         if (self%data(i)%s == value) then
+            result = .true.
+            return
+         end if
+      end do
+      result = .false.
+   end function
+
+   subroutine add_to_set(self, value)
+      !# Treat the stringbuffer as if it were a set.
+      !# Add `value` only if it's not yet in the stringbuffer.
+      class(StringBuffer), intent(inout) :: self
+      character(len=*), intent(in) :: value
+
+      if (.not. self%contains(value)) then
+         call self%append(value)
+      end if
+   end subroutine
+
+   function last(self) result(result)
+      !# Returns the last element in the stringbuffer.
+      class(StringBuffer), intent(in) :: self
+      character(len=:), allocatable :: result
+
+      call assert(self%size > 0, "IndexError: the stringbuffer is empty")
+
+      result = self%data(self%size)%s
+   end function
+
+   function min_elem(self) result(result)
+      !# Returns the minimal element.
+      class(StringBuffer), intent(in) :: self
+      character(len=:), allocatable :: result
+      integer :: i
+
+      call assert(self%size > 0, "IndexError: the stringbuffer is empty")
+
+      result = self%data(1)%s
+      do i = 2, self%size
+         if (self%data(i)%s < result) then
+            result = self%data(i)%s
+         end if
+      end do
+   end function
+
+   function max_elem(self) result(result)
+      !# Returns the maximal element.
+      class(StringBuffer), intent(in) :: self
+      character(len=:), allocatable :: result
+      integer :: i
+
+      call assert(self%size > 0, "IndexError: the stringbuffer is empty")
+
+      result = self%data(1)%s
+      do i = 2, self%size
+         if (self%data(i)%s > result) then
+            result = self%data(i)%s
+         end if
+      end do
+   end function
+
+   function count_elems(self, value) result(result)
+      !# Counts how many times `value` is present in the stringbuffer.
+      class(StringBuffer), intent(in) :: self
+      character(len=*), intent(in) :: value
+      integer :: i, result
+
+      result = 0
+      do i = 1, self%size
+         if (self%data(i)%s == value) then
+            result = result + 1
+         end if
+      end do
    end function
 
 end module jstringbuffer

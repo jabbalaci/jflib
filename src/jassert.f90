@@ -2,6 +2,7 @@ module jassert
 
 ! Assertions.
 
+   use jsys, only: stderr
    implicit none
    private
 
@@ -18,10 +19,10 @@ contains
       character(len=*), intent(in), optional :: file
       integer, intent(in), optional :: line
       if (.not. condition) then
-         print '(a)', "ASSERTION FAILED"
-         if (present(message)) print *, "Message: ", message
-         if (present(file)) print *, "File: ", file
-         if (present(line)) print '(x,g0,g0)', "Line: ", line
+         write (stderr, '(*(g0))') "ASSERTION FAILED"
+         if (present(message)) write (stderr, '(*(g0))') " Message: ", message
+         if (present(file)) write (stderr, '(*(g0))') " File: ", file
+         if (present(line)) write (stderr, '(*(g0))') " Line: ", line
          error stop 1
       end if
    end subroutine

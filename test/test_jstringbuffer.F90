@@ -16,6 +16,13 @@ program test_jstringbuffer
    call test_is_sorted()
    call test_pop()
    call test_is_empty()
+   call test_contains()
+   call test_add_to_set()
+   call test_capacity()
+   call test_last()
+   call test_min_elem()
+   call test_max_elem()
+   call test_count_elems()
 
    print '(a)', "OK"
 
@@ -249,6 +256,133 @@ contains
       call assert_true(sb%is_empty())
       call sb%append("aa")
       call assert_false(sb%is_empty())
+   end subroutine
+
+   subroutine test_contains()
+      type(StringBuffer) :: sb
+
+      call assert_false(sb%contains("aa"))
+      call sb%append("aa")
+      call assert_true(sb%contains("aa"))
+      call sb%append("bb"); call sb%append("cc"); call sb%append("dd")
+      call assert_true(sb%contains("aa"))
+      call assert_true(sb%contains("bb"))
+      call assert_true(sb%contains("cc"))
+      call assert_true(sb%contains("dd"))
+      call assert_false(sb%contains("xx"))
+   end subroutine
+
+   subroutine test_add_to_set()
+      type(StringBuffer) :: sb
+
+      call assert(sb%number_of_elems() == 0)
+      call sb%add_to_set("aa")
+      call assert(sb%number_of_elems() == 1)
+      call sb%add_to_set("aa")
+      call sb%add_to_set("aa")
+      call sb%add_to_set("aa")
+      call assert(sb%number_of_elems() == 1)
+      call sb%add_to_set("bb")
+      call assert(sb%number_of_elems() == 2)
+      call sb%add_to_set("bb")
+      call sb%add_to_set("bb")
+      call sb%add_to_set("bb")
+      call sb%add_to_set("bb")
+      call assert(sb%number_of_elems() == 2)
+   end subroutine
+
+   subroutine test_capacity()
+      type(StringBuffer) :: sb, big
+      integer :: old_capacity, new_capacity, i
+
+      old_capacity = sb%get_capacity()
+      call assert(sb%number_of_elems() == 0)
+      call assert(sb%get_capacity() == old_capacity)
+      call sb%set_capacity(old_capacity - 1)  !# smaller
+      call assert(sb%get_capacity() == old_capacity)
+      new_capacity = old_capacity + 1
+      call sb%set_capacity(new_capacity)
+      call assert(sb%get_capacity() == new_capacity)
+      call sb%clear()
+      call assert(sb%get_capacity() == old_capacity)
+      !#
+      old_capacity = big%get_capacity()
+      call assert(big%get_capacity() == old_capacity)
+      call big%set_capacity(20)
+      call assert(big%get_capacity() == 20)
+      do i = 1, 100
+         call big%append(to_str(i))
+      end do
+      call assert(big%number_of_elems() == 100)
+      call assert(big%get_capacity() >= 100)
+      call big%set_capacity(10000)
+      call assert(big%number_of_elems() == 100)
+      call assert(big%get_capacity() == 10000)
+   end subroutine
+
+   subroutine test_last()
+      type(StringBuffer) :: sb
+      character(len=:), allocatable :: dummy
+
+      call sb%append("aa")
+      call assert(sb%last() == "aa")
+      call sb%append("bb")
+      call assert(sb%last() == "bb")
+      dummy = sb%pop()
+      call assert(sb%last() == "aa")
+   end subroutine
+
+   subroutine test_min_elem()
+      type(StringBuffer) :: sb
+      integer :: i, numbers(5)
+
+      call sb%append("bb")
+      call assert(sb%min_elem() == "bb")
+      call sb%append("aa")
+      call assert(sb%min_elem() == "aa")
+      call sb%append("cc")
+      call assert(sb%min_elem() == "aa")
+      !#
+      call sb%clear()
+      numbers = [5, 4, 1, 3, 2]
+      do i = 1, size(numbers)
+         call sb%append(to_str(numbers(i)))
+      end do
+      call assert(sb%join(",") == "5,4,1,3,2")
+      call assert(sb%min_elem() == "1")
+   end subroutine
+
+   subroutine test_max_elem()
+      type(StringBuffer) :: sb
+      integer :: i, numbers(5)
+
+      call sb%append("bb")
+      call assert(sb%max_elem() == "bb")
+      call sb%append("aa")
+      call assert(sb%max_elem() == "bb")
+      call sb%append("cc")
+      call assert(sb%max_elem() == "cc")
+      !#
+      call sb%clear()
+      numbers = [1, 4, 5, 3, 2]
+      do i = 1, size(numbers)
+         call sb%append(to_str(numbers(i)))
+      end do
+      call assert(sb%join(",") == "1,4,5,3,2")
+      call assert(sb%max_elem() == "5")
+   end subroutine
+
+   subroutine test_count_elems()
+      type(StringBuffer) :: sb
+
+      call sb%append("aa")
+      call sb%append("bb"); call sb%append("bb"); call sb%append("bb")
+      call sb%append("cc"); call sb%append("cc")
+
+      call assert(sb%count_elems("xx") == 0)
+      call assert(sb%count_elems("aa") == 1)
+      call assert(sb%count_elems("bb") == 3)
+      call assert(sb%count_elems("cc") == 2)
    end subroutine
 
 end program

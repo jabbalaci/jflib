@@ -12,4 +12,5 @@ program example_jstringbuffer
    print '(i0)', sb%total_length()
    print '(*(g0))', "'", sb%to_string(), "'"
    print '(*(g0))', "'", sb%join(", "), "'"
+   call sb%stats()
 end program
