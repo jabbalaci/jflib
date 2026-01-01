@@ -8,7 +8,7 @@ module jstring
 ! Working with strings and characters.
 
    use jconstants
-   use jassert
+   use jassert, only: assert
    use jsys, only: stderr
    use jstringbuffer, only: StringBuffer
    implicit none
