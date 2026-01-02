@@ -29,6 +29,11 @@ program test_jstring
    ! call test_number_of_tokens_with_delimiter()
    call test_split_with_witespace()
    call test_split_with_delimiter()
+   call test_removeprefix()
+   call test_removesuffix()
+   call test_zfill()
+   call test_capitalize()
+   call test_swapcase()
 
    print '(a)', "OK"
 
@@ -223,6 +228,9 @@ contains
       call assert_true(endswith("", ""))
       call assert_false(endswith("", "a"))
       call assert_true(endswith("a", ""))
+      call assert_false(endswith("jpg, png", "jpg"))
+      call assert_false(endswith("gif, jpg, png", "jpg"))
+      call assert_true(endswith("gif, jpg, png", "png"))
    end subroutine
 
    subroutine test_replace()
@@ -549,6 +557,56 @@ contains
       call expected%append("b--c")
       call assert_true(got%equals(expected))
       call got%clear(); call expected%clear()
+   end subroutine
+
+   subroutine test_removeprefix()
+      call assert(removeprefix("", "") == "")
+      call assert(removeprefix("abcd", "") == "abcd")
+      call assert(removeprefix("abcd", "xx") == "abcd")
+      call assert(removeprefix("abcd", "a") == "bcd")
+      call assert(removeprefix("abcd", "ab") == "cd")
+      call assert(removeprefix("abcd", "abc") == "d")
+      call assert(removeprefix("abcd", "abcd") == "")
+      call assert(removeprefix("abcd", "abcde") == "abcd")
+      call assert(removeprefix("ab,cd,ef", "cd") == "ab,cd,ef")
+   end subroutine
+
+   subroutine test_removesuffix()
+      call assert(removesuffix("", "") == "")
+      call assert(removesuffix("abcd", "") == "abcd")
+      call assert(removesuffix("abcd", "xx") == "abcd")
+      call assert(removesuffix("abcd", "cd") == "ab")
+      call assert(removesuffix("abcd", "bcd") == "a")
+      call assert(removesuffix("abcd", "abcd") == "")
+      call assert(removesuffix("abcd", "abcde") == "abcd")
+      call assert(removesuffix("ab,cd,ef", "cd") == "ab,cd,ef")
+   end subroutine
+
+   subroutine test_zfill()
+      call assert(zfill("7", 3) == "007")
+      call assert(zfill("7", 2) == "07")
+      call assert(zfill("7", 1) == "7")
+      call assert(zfill("7", 0) == "7")
+      call assert(zfill("7", -1) == "7")
+      call assert(zfill("7", -10) == "7")
+      call assert(zfill("2026", 10) == "0000002026")
+   end subroutine
+
+   subroutine test_capitalize()
+      call assert(capitalize("") == "")
+      call assert(capitalize("x") == "X")
+      call assert(capitalize("laci") == "Laci")
+      call assert(capitalize(" laci") == " laci")
+      call assert(capitalize("lACI") == "Laci")
+   end subroutine
+
+   subroutine test_swapcase()
+      call assert(swapcase("") == "")
+      call assert(swapcase("Laci") == "lACI")
+      call assert(swapcase("lACI") == "Laci")
+      call assert(swapcase(swapcase("Laci")) == "Laci")
+      call assert(swapcase(swapcase("aBcDeF")) == "aBcDeF")
+      call assert(swapcase(swapcase("| aB,cD, eF ;")) == "| aB,cD, eF ;")
    end subroutine
 
 end program

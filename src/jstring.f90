@@ -17,7 +17,7 @@ module jstring
    public :: islower, isupper, isspace, isdigit, isascii, &
              lower, upper, find, rfind, is_in, strip, lstrip, rstrip, &
              startswith, endswith, replace, slice, rev, &
-             split
+             split, removeprefix, removesuffix, zfill, capitalize, swapcase
 
 contains
 
@@ -534,6 +534,81 @@ contains
          ! write (stderr, '(*(g0))') "'", s(start:len(s)), "'"
          call sb%append(s(start:len(s)))
       end if
+   end function
+
+   function removeprefix(s, prefix) result(result)
+      !# Removes the given prefix from the beginning of `s`.
+      !# Returns `s` without the prefix.
+      character(len=*), intent(in) :: s
+      character(len=*), intent(in) :: prefix
+      character(len=:), allocatable :: result
+
+      if (.not. startswith(s, prefix)) then
+         result = s
+         return
+      end if
+      !# else:
+      result = s(len(prefix) + 1:)
+   end function
+
+   function removesuffix(s, suffix) result(result)
+      !# Removes the given suffix from the end of `s`.
+      !# Returns `s` without the suffix.
+      character(len=*), intent(in) :: s
+      character(len=*), intent(in) :: suffix
+      character(len=:), allocatable :: result
+
+      if (.not. endswith(s, suffix)) then
+         result = s
+         return
+      end if
+      !# else:
+      result = s(1:len(s) - len(suffix))
+   end function
+
+   function zfill(s, length) result(result)
+      character(len=*), intent(in) :: s
+      integer, intent(in) :: length
+      character(len=:), allocatable :: result
+      integer :: diff
+
+      if (length <= len(s)) then
+         result = s
+         return
+      end if
+      !# else:
+      diff = length - len(s)
+      result = repeat("0", diff)//s
+   end function
+
+   function capitalize(s) result(result)
+      !# Capitalizes `s`: makes the first letter uppercase, and the rest lowercase.
+      character(len=*), intent(in) :: s
+      character(len=:), allocatable :: result
+
+      if (len(s) == 0) then
+         result = s
+         return
+      end if
+      !# else
+      result = upper(s(1:1))//lower(s(2:))
+   end function
+
+   function swapcase(s) result(t)
+      !# Swaps the case of every character in `s`.
+      !# Lowercase becomes uppercase, and vice versa.
+      character(len=*), intent(in) :: s
+      character(len=:), allocatable :: t
+      integer :: i
+
+      t = s
+      do i = 1, len(t)
+         if (isupper(t(i:i))) then
+            t(i:i) = lower(t(i:i))
+         else if (islower(t(i:i))) then
+            t(i:i) = upper(t(i:i))
+         end if
+      end do
    end function
 
 end module jstring
