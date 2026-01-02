@@ -23,6 +23,7 @@ program test_jstringbuffer
    call test_min_elem()
    call test_max_elem()
    call test_count_elems()
+   call test_swap()
 
    print '(a)', "OK"
 
@@ -383,6 +384,21 @@ contains
       call assert(sb%count_elems("aa") == 1)
       call assert(sb%count_elems("bb") == 3)
       call assert(sb%count_elems("cc") == 2)
+   end subroutine
+
+   subroutine test_swap()
+      type(StringBuffer) :: sb
+
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call assert(sb%join(",") == "aa,bb,cc")
+      call sb%swap(1, 3)
+      call assert(sb%join(",") == "cc,bb,aa")
+      call sb%swap(1, 1)
+      call assert(sb%join(",") == "cc,bb,aa")
+      call sb%swap(2, 3)
+      call assert(sb%join(",") == "cc,aa,bb")
+      call sb%swap(3, 2)
+      call assert(sb%join(",") == "cc,bb,aa")
    end subroutine
 
 end program

@@ -20,7 +20,7 @@ module jstringbuffer
          to_string, join, &
          equals, clear, get, sort, sorted, copy, set, is_sorted, pop, is_empty, &
          contains, add_to_set, get_capacity, set_capacity, last, min_elem, max_elem, &
-         count_elems
+         count_elems, swap
    end type StringBuffer
 
 contains
@@ -407,5 +407,21 @@ contains
          end if
       end do
    end function
+
+   subroutine swap(self, i, j)
+      !# Swaps the i^{th} and j^{th} elements.
+      class(StringBuffer), intent(inout) :: self
+      integer, intent(in) :: i, j
+      type(String) :: temp
+
+      call assert((1 <= i) .and. (i <= self%size), "IndexError: index out of range")
+      call assert((1 <= j) .and. (j <= self%size), "IndexError: index out of range")
+
+      if (i == j) return
+      !# else
+      temp = self%data(i)
+      self%data(i) = self%data(j)
+      self%data(j) = temp
+   end subroutine
 
 end module jstringbuffer
