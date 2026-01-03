@@ -7,17 +7,34 @@ module jstring
 
 ! Working with strings and characters.
 
-   use jconstants
+   use iso_fortran_env, only: stderr => error_unit
    use jassert, only: assert
-   use jsys, only: stderr
    use jstringbuffer, only: StringBuffer
    implicit none
    private
 
+   !# see https://jabbalaci.github.io/teaching-assets/hun/python/ascii/asciichart.png
+   character, parameter :: NUL = achar(0)    !# '\0'
+   character, parameter :: BS = achar(8)     !# backspace
+   character, parameter :: TAB = achar(9)    !# '\t'
+   character, parameter :: LF = achar(10)    !# '\n'
+   character, parameter :: CR = achar(13)    !# '\r'
+   character, parameter :: ESC = achar(27)   !#
+   character(len=*), parameter :: WHITESPACE = " "//TAB//LF//CR
+   character(len=*), parameter :: DIGITS = "0123456789"
+   character(len=*), parameter :: ASCII_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+   character(len=*), parameter :: ASCII_LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
+   character(len=*), parameter :: ASCII_UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+   public :: NUL, BS, TAB, LF, CR, ESC, &
+             WHITESPACE, DIGITS, &
+             ASCII_LETTERS, ASCII_LOWERCASE, ASCII_UPPERCASE
+
    public :: islower, isupper, isspace, isdigit, isascii, &
              lower, upper, find, rfind, is_in, strip, lstrip, rstrip, &
              startswith, endswith, replace, slice, rev, &
-             split, removeprefix, removesuffix, zfill, capitalize, swapcase
+             split, removeprefix, removesuffix, zfill, capitalize, swapcase, &
+             center, equal_strings
 
 contains
 
@@ -609,6 +626,36 @@ contains
             t(i:i) = upper(t(i:i))
          end if
       end do
+   end function
+
+   function equal_strings(s1, s2) result(result)
+      !# Checks if two strings are equal.
+      !# "*" == "* " is true in Fortran since the first string will be padded to length 2.
+      !# This function also verifies if the strings have the same length.
+      character(len=*), intent(in) :: s1, s2
+      logical :: result
+
+      result = (len(s1) == len(s2)) .and. (s1 == s2)
+   end function
+
+   function center(s, width) result(result)
+      !# Centers a string of a given width.
+      character(len=*), intent(in) :: s
+      integer, intent(in) :: width
+      character(len=:), allocatable :: result
+      integer :: diff, half
+
+      if (width <= len(s)) then
+         result = s
+         return
+      end if
+      !# else:
+      diff = width - len(s)
+      half = diff / 2
+      result = repeat(" ", half)//s//repeat(" ", half)
+      if (mod(diff, 2) == 1) then
+         result = result//" "
+      end if
    end function
 
 end module jstring

@@ -2,13 +2,17 @@ module jstringbuffer
 
 ! A stringbuffer for storing variable-length strings.
 
-   use jtypes, only: String
    use jassert, only: assert
    implicit none
    private
    integer, parameter :: INITIAL_CAPACITY = 8
 
-   public :: StringBuffer
+   public :: String, StringBuffer
+
+   type :: String
+      !# wrapper type (box) for variable-length strings
+      character(len=:), allocatable :: s
+   end type String
 
    type :: StringBuffer
       integer, private :: size = 0  ! number of elems

@@ -2,13 +2,10 @@ module jsys
 
 ! Imitating Python's sys module.
 
-   use iso_fortran_env, only: stdin => input_unit, &    !# 5
-                              stdout => output_unit, &  !# 6
-                              stderr => error_unit      !# 0
    implicit none
    private
 
-   public :: argc, argv, stdin, stdout, stderr
+   public :: argc, argv
 
 contains
 

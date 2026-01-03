@@ -1,5 +1,0 @@
-cat:
-	cat Justfile
-
-clean:
-	rm -f ./*.mod

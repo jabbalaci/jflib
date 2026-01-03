@@ -2,7 +2,7 @@ module jassert
 
 ! Assertions.
 
-   use jsys, only: stderr
+   use iso_fortran_env, only: stderr => error_unit
    implicit none
    private
 

@@ -1,7 +1,8 @@
 program test_jstring
+   use iso_fortran_env, only: stderr => error_unit
    use jassert
-   use jstring
    use jconstants
+   use jstring
    use jstringbuffer, only: StringBuffer
    implicit none
 
@@ -34,6 +35,7 @@ program test_jstring
    call test_zfill()
    call test_capitalize()
    call test_swapcase()
+   call test_center()
 
    print '(a)', "OK"
 
@@ -607,6 +609,16 @@ contains
       call assert(swapcase(swapcase("Laci")) == "Laci")
       call assert(swapcase(swapcase("aBcDeF")) == "aBcDeF")
       call assert(swapcase(swapcase("| aB,cD, eF ;")) == "| aB,cD, eF ;")
+   end subroutine
+
+   subroutine test_center()
+      call assert_true(equal_strings(center("*", -1), "*"))
+      call assert_true(equal_strings(center("*", 0), "*"))
+      call assert_true(equal_strings(center("*", 1), "*"))
+      call assert_true(equal_strings(center("*", 2), "* "))
+      call assert_true(equal_strings(center("*", 3), " * "))
+      call assert_true(equal_strings(center("*", 4), " *  "))
+      call assert_true(equal_strings(center("*", 5), "  *  "))
    end subroutine
 
 end program

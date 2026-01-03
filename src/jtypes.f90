@@ -6,11 +6,6 @@ module jtypes
    implicit none
    private
 
-   public :: sp, dp, String
-
-   type :: String
-      !# wrapper type (box) for variable-length strings
-      character(len=:), allocatable :: s
-   end type String
+   public :: sp, dp
 
 end module jtypes
