@@ -30,11 +30,32 @@ module jstring
              WHITESPACE, DIGITS, &
              ASCII_LETTERS, ASCII_LOWERCASE, ASCII_UPPERCASE
 
-   public :: islower, isupper, isspace, isdigit, isascii, &
-             lower, upper, find, rfind, is_in, strip, lstrip, rstrip, &
-             startswith, endswith, replace, slice, rev, &
-             split, removeprefix, removesuffix, zfill, capitalize, swapcase, &
-             center, equal_strings
+   public :: capitalize, &
+             center, &
+             endswith, &
+             equal_strings, &  !# same length .and. same content
+             find, &
+             isascii, &
+             isdigit, &
+             is_in, &          !# ex.: "prog" in "programming"
+             islower, &
+             isspace, &
+             isupper, &
+             lower, &
+             lstrip, &
+             removeprefix, &
+             removesuffix, &
+             replace, &
+             rev, &            !# reverse a string: "abcd" -> "dcba"
+             rfind, &
+             rstrip, &
+             slice, &          !# like in Python: s[1:5:2], or s[10:2:-2]
+             split, &          !# returns a StringBuffer with the tokens; works like in Python
+             startswith, &
+             strip, &
+             swapcase, &
+             upper, &
+             zfill
 
 contains
 

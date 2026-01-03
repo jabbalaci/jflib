@@ -20,11 +20,33 @@ module jstringbuffer
       type(String), private, allocatable :: data(:)
    contains
       procedure, private :: quicksort
-      procedure, public :: append, debug, stats, number_of_elems, total_length, &
-         to_string, join, &
-         equals, clear, get, sort, sorted, copy, set, is_sorted, pop, is_empty, &
-         contains, add_to_set, get_capacity, set_capacity, last, min_elem, max_elem, &
-         count_elems, swap
+      procedure, public :: &
+         add_to_set, &              !# treat it as if it were a set (no duplicates)
+         append, &                  !# add an element to the end
+         clear, &                   !# reset
+         contains, &                !# check if an element is in the stringbuffer
+         copy, &                    !# make a complete, independent copy
+         count_elems, &             !# a given element is present how many times
+         debug, &                   !# print content to stderr
+         equals, &                  !# compare with another stringbuffer
+         get, &                     !# get the i^{th} element
+         get_capacity, &            !# current capacity
+         is_empty, &                !# Is the stringbuffer empty?
+         is_sorted, &               !# Is the stringbuffer sorted?
+         join, &                    !# join the elements by a delimiter (default delimiter: "")
+         last, &                    !# last elem; first elem: get(1)
+         max_elem, &                !# get the largest element
+         min_elem, &                !# get the smallest element
+         number_of_elems, &         !# number of appended elements
+         pop, &                     !# take out and return the i^{th} element
+         set, &                     !# set the value of the i^{th} element
+         set_capacity, &            !# increase the capacity
+         sort, &                    !# sort in-place
+         sorted, &                  !# return a sorted copy
+         stats, &                   !# some statistics (for debug purposes)
+         swap, &                    !# swap two elements
+         to_string, &               !# get the content as a string
+         total_length               !# to_string() would return a string of this length
    end type StringBuffer
 
 contains
@@ -153,22 +175,30 @@ contains
       !# Get the content of the stringbuffer as a string.
       class(StringBuffer), intent(in) :: self
       character(len=:), allocatable :: result
-      integer :: i, j, length
 
-      if (.not. allocated(self%data)) then
-         result = ""
-      else
-         allocate (character(len=self%total_length()) :: result)
-         j = 1
-         do i = 1, self%size
-            associate (s => self%data(i)%s)
-               length = len(s)
-               result(j:j + length - 1) = s
-               j = j + length
-            end associate
-         end do
-      end if
+      result = self%join()
    end function
+
+   ! function to_string(self) result(result)
+   !    !# Get the content of the stringbuffer as a string.
+   !    class(StringBuffer), intent(in) :: self
+   !    character(len=:), allocatable :: result
+   !    integer :: i, j, length
+
+   !    if (.not. allocated(self%data)) then
+   !       result = ""
+   !    else
+   !       allocate (character(len=self%total_length()) :: result)
+   !       j = 1
+   !       do i = 1, self%size
+   !          associate (s => self%data(i)%s)
+   !             length = len(s)
+   !             result(j:j + length - 1) = s
+   !             j = j + length
+   !          end associate
+   !       end do
+   !    end if
+   ! end function
 
    function join(self, sep) result(result)
       !# Join the elements by a delimiter.
