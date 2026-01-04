@@ -32,6 +32,7 @@ module jstring
 
    public :: capitalize, &
              center, &
+             count_elems, &    !# like Python's count: "Anna".count("n")
              endswith, &
              equal_strings, &  !# same length .and. same content
              find, &
@@ -339,6 +340,31 @@ contains
             end if
          else
             t = t//s(i:i)
+            i = i + 1
+         end if
+      end do
+   end function
+
+   function count_elems(s, sub) result(result)
+      !# In `s`, the substring `sub` is present how many times?
+      !# No overlapping. Ex.: in "aaa", "aa" is present just once.
+      character(len=*), intent(in) :: s, sub
+      integer :: i, result, sub_len
+
+      if (sub == "") then
+         result = len(s) + 1
+         return
+      end if
+
+      result = 0
+      sub_len = len(sub)
+
+      i = 1
+      do while (i <= len(s))
+         if (s(i:min(len(s), i + sub_len - 1)) == sub) then
+            result = result + 1
+            i = i + sub_len
+         else
             i = i + 1
          end if
       end do

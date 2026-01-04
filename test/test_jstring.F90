@@ -36,6 +36,7 @@ program test_jstring
    call test_capitalize()
    call test_swapcase()
    call test_center()
+   call test_count_elems()
 
    print '(a)', "OK"
 
@@ -619,6 +620,21 @@ contains
       call assert_true(equal_strings(center("*", 3), " * "))
       call assert_true(equal_strings(center("*", 4), " *  "))
       call assert_true(equal_strings(center("*", 5), "  *  "))
+   end subroutine
+
+   subroutine test_count_elems()
+      call assert(count_elems("anna", "a") == 2)
+      call assert(count_elems("anna", "n") == 2)
+      call assert(count_elems("Anna", "a") == 1)
+      call assert(count_elems("Anna", "A") == 1)
+      call assert(count_elems("aaa", "a") == 3)
+      call assert(count_elems("aaa", "aa") == 1)
+      call assert(count_elems("banana", "na") == 2)
+      call assert(count_elems("", "") == 1)
+      call assert(count_elems("a", "") == 2)
+      call assert(count_elems("123", "") == 4)
+      call assert(count_elems("", "a") == 0)
+      call assert(count_elems("", "ab") == 0)
    end subroutine
 
 end program
