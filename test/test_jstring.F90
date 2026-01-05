@@ -37,6 +37,7 @@ program test_jstring
    call test_swapcase()
    call test_center()
    call test_count_elems()
+   call test_explode()
 
    print '(a)', "OK"
 
@@ -635,6 +636,27 @@ contains
       call assert(count_elems("123", "") == 4)
       call assert(count_elems("", "a") == 0)
       call assert(count_elems("", "ab") == 0)
+   end subroutine
+
+   subroutine test_explode()
+      type(StringBuffer) :: got
+      type(StringBuffer) :: expected
+
+      got = explode("abc")
+      call expected%append("a"); call expected%append("b"); call expected%append("c")
+      call assert_true(got%equals(expected))
+      !#
+      got = explode("")
+      call assert_true(got%is_empty())
+      !#
+      got = explode("1 2 3")
+      call expected%clear()
+      call expected%append("1"); call expected%append(" ")
+      call expected%append("2"); call expected%append(" ")
+      call expected%append("3")
+      call assert_true(got%equals(expected))
+      call assert(got%number_of_elems() == 5)
+      !#
    end subroutine
 
 end program

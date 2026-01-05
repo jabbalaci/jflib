@@ -24,6 +24,9 @@ program test_jstringbuffer
    call test_max_elem()
    call test_count_elems()
    call test_swap()
+   call test_reverse()
+   call test_reversed()
+   call test_rotate()
 
    print '(a)', "OK"
 
@@ -399,6 +402,83 @@ contains
       call assert(sb%join(",") == "cc,aa,bb")
       call sb%swap(3, 2)
       call assert(sb%join(",") == "cc,bb,aa")
+   end subroutine
+
+   subroutine test_reverse()
+      type(StringBuffer) :: got
+
+      call got%reverse()
+      call assert(got%is_empty())
+      !#
+      call got%append("aa")
+      call got%reverse()
+      call assert(got%number_of_elems() == 1 .and. got%get(1) == "aa")
+      !#
+      call got%append("bb")
+      call assert(got%get(1) == "aa" .and. got%get(2) == "bb")
+      call got%reverse()
+      call assert(got%get(1) == "bb" .and. got%get(2) == "aa")
+      call got%reverse()
+      call assert(got%get(1) == "aa" .and. got%get(2) == "bb")
+      !#
+      call got%append("cc")
+      call assert(got%last() == "cc")
+      call assert(got%get(1) == "aa" .and. got%get(2) == "bb" .and. got%get(3) == "cc")
+      call got%reverse()
+      call assert(got%get(1) == "cc" .and. got%get(2) == "bb" .and. got%get(3) == "aa")
+      call got%reverse()
+      call assert(got%get(1) == "aa" .and. got%get(2) == "bb" .and. got%get(3) == "cc")
+   end subroutine
+
+   subroutine test_reversed()
+      type(StringBuffer) :: original, reversed
+
+      call original%append("aa"); call original%append("bb"); call original%append("cc")
+      call assert(original%join(",") == "aa,bb,cc")
+      reversed = original%reversed()
+      call assert(original%join(",") == "aa,bb,cc")
+      call assert(reversed%join(",") == "cc,bb,aa")
+   end subroutine
+
+   subroutine test_rotate()
+      type(StringBuffer) :: sb
+      type(StringBuffer) :: expected
+
+      call sb%rotate(0)
+      call sb%append("a"); call sb%append("b"); call sb%append("c")
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(0)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(3)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(6)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(-3)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(-6)
+      call assert(sb%join(",") == "a,b,c")
+      !#
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(1)
+      call assert(sb%join(",") == "c,a,b")
+      call sb%rotate(1)
+      call assert(sb%join(",") == "b,c,a")
+      call sb%rotate(1)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(2026)
+      call assert(sb%join(",") == "c,a,b")
+      !#
+      call assert(sb%join(",") == "c,a,b")
+      call sb%rotate(-1)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(-1)
+      call assert(sb%join(",") == "b,c,a")
+      call sb%rotate(-1)
+      call assert(sb%join(",") == "c,a,b")
+      call sb%rotate(-1)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%rotate(-2026)
+      call assert(sb%join(",") == "b,c,a")
    end subroutine
 
 end program

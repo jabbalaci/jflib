@@ -2,12 +2,13 @@ module jstringbuffer
 
 ! A stringbuffer for storing variable-length strings.
 
+   use iso_fortran_env, only: stderr => error_unit
    use jassert, only: assert
    implicit none
    private
    integer, parameter :: INITIAL_CAPACITY = 8
 
-   public :: String, StringBuffer
+   public :: StringBuffer
 
    type :: String
       !# wrapper type (box) for variable-length strings
@@ -39,6 +40,9 @@ module jstringbuffer
          min_elem, &                !# get the smallest element
          number_of_elems, &         !# number of appended elements
          pop, &                     !# take out and return the i^{th} element
+         reverse, &                 !# reverse the elements in-place
+         reversed, &                !# return a reversed copy
+         rotate, &                  !# rotate the elements to the left/right
          set, &                     !# set the value of the i^{th} element
          set_capacity, &            !# increase the capacity
          sort, &                    !# sort in-place
@@ -311,6 +315,33 @@ contains
       call result%sort()
    end function
 
+   subroutine reverse(self)
+      !# Reverses the underlying array in-place.
+      class(StringBuffer), intent(inout) :: self
+      integer :: i, j
+      type(String) :: temp
+
+      i = 1
+      j = self%size
+      do while (i < j)
+         temp = self%data(i)
+         self%data(i) = self%data(j)
+         self%data(j) = temp
+         !#
+         i = i + 1
+         j = j - 1
+      end do
+   end subroutine
+
+   function reversed(self) result(result)
+      !# Returns a reversed copy of itself. The stringbuffer (self) is NOT modified.
+      class(StringBuffer), intent(in) :: self
+      type(StringBuffer) :: result
+
+      result = self%copy()
+      call result%reverse()
+   end function
+
    function copy(self) result(result)
       !# Creates and returns an independent copy of itself.
       class(StringBuffer), intent(in) :: self
@@ -456,6 +487,32 @@ contains
       temp = self%data(i)
       self%data(i) = self%data(j)
       self%data(j) = temp
+   end subroutine
+
+   subroutine rotate(self, rotations)
+      !# Rotates the elements to the left/right by `n` positions.
+      !# Positive n: rotate right (move elements to the right)
+      !# Negative n: rotate left (move elements to the left)
+      class(StringBuffer), intent(inout) :: self
+      integer, intent(in) :: rotations
+      integer :: n
+
+      if (self%size < 2) then
+         return
+      end if
+
+      n = mod(rotations, self%size)
+      if (n == 0) then
+         return
+      end if
+      !# else:
+      if (n > 0) then
+         self%data = [self%data(self%size + 1 - n:self%size), self%data(1:self%size - n)]
+      else
+         !# if n < 0
+         n = abs(n)
+         self%data = [self%data(n + 1:self%size), self%data(1:n)]
+      end if
    end subroutine
 
 end module jstringbuffer

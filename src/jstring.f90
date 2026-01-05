@@ -30,33 +30,35 @@ module jstring
              WHITESPACE, DIGITS, &
              ASCII_LETTERS, ASCII_LOWERCASE, ASCII_UPPERCASE
 
-   public :: capitalize, &
-             center, &
-             count_elems, &    !# like Python's count: "Anna".count("n")
-             endswith, &
-             equal_strings, &  !# same length .and. same content
-             find, &
-             isascii, &
-             isdigit, &
-             is_in, &          !# ex.: "prog" in "programming"
-             islower, &
-             isspace, &
-             isupper, &
-             lower, &
-             lstrip, &
-             removeprefix, &
-             removesuffix, &
-             replace, &
-             rev, &            !# reverse a string: "abcd" -> "dcba"
-             rfind, &
-             rstrip, &
-             slice, &          !# like in Python: s[1:5:2], or s[10:2:-2]
-             split, &          !# returns a StringBuffer with the tokens; works like in Python
-             startswith, &
-             strip, &
-             swapcase, &
-             upper, &
-             zfill
+   public :: &          !# Python equivalents:
+      capitalize, &     !# "anna".capitalize() -> "Anna"
+      center, &         !# "*".center(3) -> " * "
+      count_elems, &    !# "Anna".count("n")
+      endswith, &       !# "01.png".endswith(".png") -> True
+      equal_strings, &  !# same length .and. same content
+      explode, &        !# list("abc") -> ["a", "b", "c"]
+      find, &           !# "Anna".find("n") -> 1 (Python is 0-based)
+      isascii, &        !# "Éva".isascii() -> False
+      isdigit, &        !# "2026".isdigit() -> True
+      is_in, &          !# "prog" in "programming" -> True
+      islower, &        !# "anna".islower() -> True
+      isspace, &        !# "   \t    \r\n" -> True
+      isupper, &        !# "ANNA".isupper() -> True
+      lower, &          !# "aNNa".lower() -> "anna"
+      lstrip, &         !# " \t   anna  " -> "anna  "
+      removeprefix, &   !# "01.jpg".removeprefix("01") -> ".jpg"
+      removesuffix, &   !# "01.jpg".removesuffix(".jpg") -> "01"
+      replace, &        !# "cat dog cat".replace("cat", "kitten") -> "kitten dog kitten"
+      rev, &            !# "abcd"[::-1] -> "dcba"
+      rfind, &          !# "Anna".rfind("n") -> 2 (Python is 0-based)
+      rstrip, &         !# "  anna  \n" -> "  anna"
+      slice, &          !# like in Python: s[1:5:2], or s[10:2:-2]
+      split, &          !# "  aa  bb  cc  ".split() -> ["aa", "bb", "cc"]
+      startswith, &     !# "01.png".endswith("01") -> True
+      strip, &          !# "  \t    aa    \t   \n".strip() -> "aa"
+      swapcase, &       !# "Anna".swapcase() -> "aNNA"
+      upper, &          !# "Anna".upper() -> "ANNA"
+      zfill             !# "7".zfill(3) -> "007
 
 contains
 
@@ -703,6 +705,17 @@ contains
       if (mod(diff, 2) == 1) then
          result = result//" "
       end if
+   end function
+
+   function explode(s) result(result)
+      !# Converts a string to a list of characters.
+      character(len=*), intent(in) :: s
+      type(StringBuffer) :: result
+      integer :: i
+
+      do i = 1, len(s)
+         call result%append(s(i:i))
+      end do
    end function
 
 end module jstring

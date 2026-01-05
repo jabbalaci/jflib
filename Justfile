@@ -31,3 +31,6 @@ examples:
 	{{call}} jstringbuffer
 	fpm run --example example_jsys -- aa bb cc dd
 	{{call}} jtypes
+
+clean:
+	rm -f ./src/*.mod
