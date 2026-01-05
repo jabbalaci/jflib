@@ -46,6 +46,7 @@ module jstringbuffer
          rotate, &                  !# rotate the elements to the left/right
          set, &                     !# set the value of the i^{th} element
          set_capacity, &            !# increase the capacity
+         slice, &                   !# sb%slice(start, end, step)
          sort, &                    !# sort in-place
          sorted, &                  !# return a sorted copy
          stats, &                   !# some statistics (for debug purposes)
@@ -543,5 +544,51 @@ contains
                    self%data(1:self%size - n)]
       call self%adjust_capacity()  ! Must be called! self%data shrank in the previous step
    end subroutine
+
+   function slice(self, start, end, step) result(res)
+      !# Slicing, similar to Python's list slicing.
+      !# Start and end positions must be positive. Step can be negative.
+      !# If `end` is too big, then it'll be truncated to the number of elements.
+      !# It returns a new stringbuffer object.
+      class(StringBuffer), intent(in) :: self
+      integer, intent(in), optional :: start, end, step
+      type(StringBuffer) :: res
+      integer :: start_val, end_val, step_val
+      integer :: i
+
+      step_val = 1          !# default value
+      if (present(step)) step_val = step
+      call assert(step_val /= 0, "ValueError: slice step cannot be zero")
+
+      if (step_val > 0) then
+         start_val = 1           !# default value
+         end_val = self%size     !# default value
+      else
+         !# negative step
+         start_val = self%size   !# default value
+         end_val = 1             !# default value
+      end if
+
+      if (present(start)) start_val = start
+      call assert(start_val >= 1, "ValueError: slice start position must be positive")
+      if (present(end)) end_val = end
+      call assert(end_val >= 1, "ValueError: slice end position must be positive")
+
+      if (step_val > 0) then
+         !# positive step
+         i = start_val
+         do while (i <= min(self%size, end_val))
+            call res%append(self%get(i))
+            i = i + step_val
+         end do
+      else
+         !# negative step
+         i = min(start_val, self%size)
+         do while (i >= max(1, end_val))
+            call res%append(self%get(i))
+            i = i + step_val  !# step is negative, so `i` will be decremented
+         end do
+      end if
+   end function
 
 end module jstringbuffer

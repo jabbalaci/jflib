@@ -28,6 +28,8 @@ program test_jstringbuffer
    call test_reversed()
    call test_rotate()
    call test_adjust_capacity()
+   call test_slice()
+   call test_slice_negative()
 
    print '(a)', "OK"
 
@@ -511,6 +513,147 @@ contains
       call assert(sb%number_of_elems() == 4)
       call assert(sb%get_capacity() >= 4)
       call assert(sb%get_array_size() == sb%get_capacity())
+   end subroutine
+
+   subroutine test_slice()
+      type(StringBuffer) :: sb, got, expected
+      integer :: i
+
+      call sb%append("a"); call sb%append("b"); call sb%append("c")
+      got = sb%slice(1, 1)
+      call expected%append("a")
+      call assert_true(got%equals(expected))
+      !#
+      call expected%clear()
+      got = sb%slice(2, 2)
+      call expected%append("b")
+      call assert_true(got%equals(expected))
+      !#
+      call expected%clear()
+      got = sb%slice(3, 3)
+      call expected%append("c")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice()
+      call assert_true(sb%equals(got))
+      !#
+      call sb%clear()
+      do i = 1, 9
+         call sb%append(to_str(i))
+      end do
+      !#
+      got = sb%slice(1, 3)
+      call assert(got%number_of_elems() == 3)
+      call assert(got%get(1) == "1" .and. got%get(2) == "2" .and. got%get(3) == "3")
+      !#
+      got = sb%slice(1, 100)
+      call assert_true(sb%equals(got))
+      !#
+      got = sb%slice(3, 4)
+      call assert(got%number_of_elems() == 2)
+      call assert(got%get(1) == "3" .and. got%get(2) == "4")
+      !#
+      got = sb%slice(3, 3)
+      call assert(got%number_of_elems() == 1)
+      call assert(got%get(1) == "3")
+      !#
+      got = sb%slice(9, 9)
+      call assert(got%number_of_elems() == 1)
+      call assert(got%get(1) == "9")
+      !#
+      got = sb%slice(3, 2)
+      call assert_true(got%is_empty())
+      !#
+      got = sb%slice(20, 30)
+      call assert_true(got%is_empty())
+      !#
+      got = sb%slice(20, 5)
+      call assert_true(got%is_empty())
+      !#
+      got = sb%slice(1, 9, 2)
+      call expected%clear()
+      call expected%append("1"); call expected%append("3"); call expected%append("5")
+      call expected%append("7"); call expected%append("9")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(1, 5, 2)
+      call expected%clear()
+      call expected%append("1"); call expected%append("3"); call expected%append("5")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(1, 6, 2)
+      call expected%clear()
+      call expected%append("1"); call expected%append("3"); call expected%append("5")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(1, 9, 1)
+      call assert_true(sb%equals(got))
+      !#
+      got = sb%slice(4, 2, 1)
+      call assert_true(got%is_empty())
+      !#
+      got = sb%slice(4, 4, 1)
+      call expected%clear()
+      call expected%append("4")
+      call assert_true(got%equals(expected))
+      !#
+      call sb%clear()
+      do i = 1, 4
+         call sb%append(to_str(i))  !# ["1", "2", "3", "4"]
+      end do
+      !#
+      got = sb%slice(2)
+      call expected%clear()
+      call expected%append("2"); call expected%append("3"); call expected%append("4")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(1, 3)
+      call expected%clear()
+      call expected%append("1"); call expected%append("2"); call expected%append("3")
+      call assert_true(got%equals(expected))
+   end subroutine
+
+   subroutine test_slice_negative()
+      type(StringBuffer) :: sb, got, expected, temp
+      integer :: i
+
+      do i = 1, 9
+         call sb%append(to_str(i))
+      end do
+      !#
+      got = sb%slice(4, 3, -1)
+      call expected%clear()
+      call expected%append("4"); call expected%append("3")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(9, 1, -1)
+      expected = sb%reversed()
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(9, 1, -2)
+      call expected%clear()
+      call expected%append("9"); call expected%append("7"); call expected%append("5")
+      call expected%append("3"); call expected%append("1")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(8, 1, -2)
+      call expected%clear()
+      call expected%append("8"); call expected%append("6")
+      call expected%append("4"); call expected%append("2")
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(5, 1, -1)
+      temp = sb%slice(1, 5)
+      expected = temp%reversed()
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(20, 1, -1)
+      expected = sb%reversed()
+      call assert_true(got%equals(expected))
+      !#
+      got = sb%slice(step=-1)
+      expected = sb%reversed()
+      call assert_true(got%equals(expected))
    end subroutine
 
 end program
