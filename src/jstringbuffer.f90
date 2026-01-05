@@ -497,22 +497,24 @@ contains
       integer, intent(in) :: rotations
       integer :: n
 
-      if (self%size < 2) then
+      if (self%size < 2) then  !# if we have 0 or 1 elem: nothing to do
          return
       end if
 
       n = mod(rotations, self%size)
-      if (n == 0) then
+      if (n == 0) then  !# 0 rotaions to perform: nothing to do
          return
       end if
-      !# else:
-      if (n > 0) then
-         self%data = [self%data(self%size + 1 - n:self%size), self%data(1:self%size - n)]
-      else
-         !# if n < 0
-         n = abs(n)
-         self%data = [self%data(n + 1:self%size), self%data(1:n)]
+
+      !# convert negative rotation to equivalent positive rotation
+      if (n < 0) then
+         n = self%size + n
       end if
+
+      !# n is positive (n > 0) if we get here
+      self%data = [self%data(self%size + 1 - n:self%size), &
+                   self%data(1:self%size - n), &
+                   self%data(self%size + 1:)]  ! Important! Extra, unused allocated area.
    end subroutine
 
 end module jstringbuffer

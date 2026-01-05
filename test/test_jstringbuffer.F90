@@ -479,6 +479,10 @@ contains
       call assert(sb%join(",") == "a,b,c")
       call sb%rotate(-2026)
       call assert(sb%join(",") == "b,c,a")
+      !#
+      call sb%rotate(1)
+      call assert(sb%join(",") == "a,b,c")
+      call sb%append("d")
    end subroutine
 
 end program
