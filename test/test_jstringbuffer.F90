@@ -27,6 +27,7 @@ program test_jstringbuffer
    call test_reverse()
    call test_reversed()
    call test_rotate()
+   call test_adjust_capacity()
 
    print '(a)', "OK"
 
@@ -442,7 +443,6 @@ contains
 
    subroutine test_rotate()
       type(StringBuffer) :: sb
-      type(StringBuffer) :: expected
 
       call sb%rotate(0)
       call sb%append("a"); call sb%append("b"); call sb%append("c")
@@ -483,6 +483,34 @@ contains
       call sb%rotate(1)
       call assert(sb%join(",") == "a,b,c")
       call sb%append("d")
+   end subroutine
+
+   subroutine test_adjust_capacity()
+      type(StringBuffer) :: sb
+
+      call assert(sb%number_of_elems() == 0)
+      call assert(sb%get_capacity() > 0)
+      call assert(sb%get_array_size() == 0)
+      !#
+      call sb%append("a")
+      call assert(sb%number_of_elems() == 1)
+      call assert(sb%get_capacity() > 0)
+      call assert(sb%get_array_size() == sb%get_capacity())
+      !#
+      call sb%append("b")
+      call sb%append("c")
+      call assert(sb%number_of_elems() == 3)
+      call assert(sb%get_array_size() == sb%get_capacity())
+      !#
+      call sb%rotate(1)  !# it'll shrink the underlying array
+      call assert(sb%number_of_elems() == 3)
+      call assert(sb%get_capacity() == 3)
+      call assert(sb%get_array_size() == 3)
+      !#
+      call sb%append("d")
+      call assert(sb%number_of_elems() == 4)
+      call assert(sb%get_capacity() >= 4)
+      call assert(sb%get_array_size() == sb%get_capacity())
    end subroutine
 
 end program

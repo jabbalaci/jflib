@@ -20,7 +20,7 @@ module jstringbuffer
       integer, private :: capacity = INITIAL_CAPACITY  ! initial capacity
       type(String), private, allocatable :: data(:)
    contains
-      procedure, private :: quicksort
+      procedure, private :: quicksort, adjust_capacity
       procedure, public :: &
          add_to_set, &              !# treat it as if it were a set (no duplicates)
          append, &                  !# add an element to the end
@@ -31,6 +31,7 @@ module jstringbuffer
          debug, &                   !# print content to stderr
          equals, &                  !# compare with another stringbuffer
          get, &                     !# get the i^{th} element
+         get_array_size, &          !# size of the underlying array (for debug purposes)
          get_capacity, &            !# current capacity
          is_empty, &                !# Is the stringbuffer empty?
          is_sorted, &               !# Is the stringbuffer sorted?
@@ -63,6 +64,21 @@ contains
       self%capacity = INITIAL_CAPACITY
       if (allocated(self%data)) then
          deallocate (self%data)
+      end if
+   end subroutine
+
+   subroutine adjust_capacity(self)  !# private
+      !# It can happen (ex.: in rotate()) that the array (self%data) shrinks,
+      !# and thus its size becomes smaller than self%capacity.
+      !# Solution: adjust self%capacity to the current size of the array.
+      class(StringBuffer), intent(inout) :: self
+
+      if (self%size == 0) then
+         return
+      end if
+      !# else, if it has at least 1 element
+      if (self%capacity > size(self%data)) then
+         self%capacity = size(self%data)
       end if
    end subroutine
 
@@ -150,8 +166,21 @@ contains
       print '(a)', "stats:"
       print '(*(g0))', " number of elems: ", self%size
       print '(*(g0))', " capacity: ", self%capacity
+      print '(*(g0))', " size of the underlying array: ", self%get_array_size()
       print '(*(g0))', " total length: ", self%total_length()
    end subroutine
+
+   function get_array_size(self) result(result)
+      !# Returns the size of the underlying array (that contains the elements).
+      class(StringBuffer), intent(in) :: self
+      integer :: result
+
+      if (.not. allocated(self%data)) then
+         result = 0
+      else
+         result = size(self%data)
+      end if
+   end function
 
    function get(self, i) result(result)
       !# Returns the string at position `i`
@@ -513,8 +542,8 @@ contains
 
       !# n is positive (n > 0) if we get here
       self%data = [self%data(self%size + 1 - n:self%size), &
-                   self%data(1:self%size - n), &
-                   self%data(self%size + 1:)]  ! Important! Extra, unused allocated area.
+                   self%data(1:self%size - n)]
+      call self%adjust_capacity()  ! Must be called! self%data shrank in the previous step
    end subroutine
 
 end module jstringbuffer
