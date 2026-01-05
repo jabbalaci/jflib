@@ -68,8 +68,8 @@ contains
    end subroutine
 
    subroutine adjust_capacity(self)  !# private
-      !# It can happen (ex.: in rotate()) that the array (self%data) shrinks,
-      !# and thus its size becomes smaller than self%capacity.
+      !# It can happen that the array (self%data) shrinks (remove()) or grows (insert()),
+      !# and thus the arry size becomes different from self%capacity.
       !# Solution: adjust self%capacity to the current size of the array.
       class(StringBuffer), intent(inout) :: self
 
@@ -77,9 +77,7 @@ contains
          return
       end if
       !# else, if it has at least 1 element
-      if (self%capacity > size(self%data)) then
-         self%capacity = size(self%data)
-      end if
+      self%capacity = size(self%data)
    end subroutine
 
    function total_length(self) result(result)
