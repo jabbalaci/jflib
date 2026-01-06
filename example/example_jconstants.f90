@@ -3,4 +3,5 @@ program example_jconstants
    implicit none
 
    print *, PI
+   print '(a)', "---"
 end program

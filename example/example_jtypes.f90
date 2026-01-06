@@ -5,4 +5,5 @@ program example_jtypes
    real(dp) :: pi = 3.14159_dp
 
    print *, x, pi
+   print '(a)', "---"
 end program

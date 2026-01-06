@@ -13,4 +13,5 @@ program example_jsys
    do i = 0, argc()
       print '(*(g0))', i, ": ", argv(i)
    end do
+   print '(a)', "---"
 end program

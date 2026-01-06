@@ -5,4 +5,5 @@ program example_jconv
    print '(a)', to_str(2026)
    print '(a)', to_hex(2026)
    print '(a)', to_bin(26)
+   print '(a)', "---"
 end program
