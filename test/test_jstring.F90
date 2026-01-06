@@ -34,6 +34,7 @@ program test_jstring
    call test_slice_negative()
    call test_split_with_delimiter()
    call test_split_with_witespace()
+   call test_splitlines()
    call test_startswith()
    call test_strip()
    call test_swapcase()
@@ -701,6 +702,60 @@ contains
       call assert(chomp("line"//LF//CR//LF) == "line")
       call assert(chomp("line"//LF//CR//LF//CR) == "line")
       call assert(chomp("line"//LF//"x") == "line"//LF//"x")
+   end subroutine
+
+   subroutine test_splitlines()
+      type(StringBuffer) :: got, expected
+
+      got = splitlines("line1"//LF//"line2"//LF)
+      call expected%append("line1"); call expected%append("line2")
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines("line1"//CRLF//"line2"//CRLF)
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines("line1"//LF//"line2")
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines("line1"//CRLF//"line2")
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines("")
+      call expected%clear()
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines(LF)
+      call expected%clear()
+      call expected%append("")
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines("line1"//LF//"line2"//LF//LF)
+      call expected%clear()
+      call expected%append("line1"); call expected%append("line2"); call expected%append("")
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines("ab c"//LF//LF//"de fg"//LF//"kl"//CRLF)
+      call expected%clear()
+      call expected%append("ab c")
+      call expected%append("")
+      call expected%append("de fg")
+      call expected%append("kl")
+      call assert_true(got%equals(expected))
+      !#
+      got = splitlines("one line"//LF)
+      call expected%clear()
+      call expected%append("one line")
+      call assert_true(got%equals(expected))
+      !# comparing with split()
+      got = split("", LF)
+      call expected%clear()
+      call expected%append("")
+      call assert_true(got%equals(expected))
+      !#
+      got = split("line"//LF, LF)
+      call expected%clear()
+      call expected%append("line"); call expected%append("")
+      call assert_true(got%equals(expected))
    end subroutine
 
 end program

@@ -20,13 +20,14 @@ module jstring
    character, parameter :: LF = achar(10)    !# '\n'
    character, parameter :: CR = achar(13)    !# '\r'
    character, parameter :: ESC = achar(27)   !#
+   character(len=2), parameter :: CRLF = CR//LF
    character(len=*), parameter :: WHITESPACE = " "//TAB//LF//CR
    character(len=*), parameter :: DIGITS = "0123456789"
    character(len=*), parameter :: ASCII_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
    character(len=*), parameter :: ASCII_LOWERCASE = "abcdefghijklmnopqrstuvwxyz"
    character(len=*), parameter :: ASCII_UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-   public :: NUL, BS, TAB, LF, CR, ESC, &
+   public :: NUL, BS, TAB, LF, CR, ESC, CRLF, &
              WHITESPACE, DIGITS, &
              ASCII_LETTERS, ASCII_LOWERCASE, ASCII_UPPERCASE
 
@@ -55,6 +56,7 @@ module jstring
       rstrip, &         !# "  anna  \n" -> "  anna"
       slice, &          !# like in Python: s[1:5:2], or s[10:2:-2]
       split, &          !# "  aa  bb  cc  ".split() -> ["aa", "bb", "cc"]
+      splitlines, &     !# "line1\nline2\n".splitlines() -> ['line1', 'line2']
       startswith, &     !# "01.png".endswith("01") -> True
       strip, &          !# "  \t    aa    \t   \n".strip() -> "aa"
       swapcase, &       !# "Anna".swapcase() -> "aNNA"
@@ -752,6 +754,21 @@ contains
       do i = 1, len(s)
          call result%append(s(i:i))
       end do
+   end function
+
+   function splitlines(s) result(result)
+      !# Return a stringbuffer of the lines in the string, breaking at line boundaries.
+      !# Supported line boundaries: "\n" or "\r\n".
+      character(len=*), intent(in) :: s
+      character(len=:), allocatable :: t
+      type(StringBuffer) :: result
+      character(len=:), allocatable :: dummy
+
+      t = replace(s, CR, "")
+      result = split(t, LF)
+      if (result%number_of_elems() > 0 .and. result%last() == "") then
+         dummy = result%pop()
+      end if
    end function
 
 end module jstring

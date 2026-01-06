@@ -33,6 +33,9 @@ program example_jstring
    print '(*(g0))', 'split("aa;bb;cc", ";"):'
    sb = split("aa;bb;cc", ";")
    call sb%debug()
+   print '(*(g0))', 'splitlines("line1\nline2\n"):'
+   sb = splitlines("line1"//LF//"line2"//LF)
+   call sb%debug()
    print '(*(g0))', 'startswith("01.png", "01"): ', startswith("01.png", "01")
    print '(*(g0))', 'strip(" \t anna \t \n"): ', '"', strip(" "//TAB//" anna "//TAB//" "//LF), '"'
    print '(*(g0))', 'swapcase("fORTRAN"): ', '"', swapcase("fORTRAN"), '"'
