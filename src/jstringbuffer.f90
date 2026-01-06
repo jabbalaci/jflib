@@ -81,7 +81,7 @@ contains
       self%capacity = size(self%data)
    end subroutine
 
-   function total_length(self) result(result)
+   pure function total_length(self) result(result)
       !# Sum of the length of every element in the stringbuffer.
       !# If we call to_string(), we get a string of this length.
       class(StringBuffer), intent(in) :: self
@@ -93,7 +93,7 @@ contains
       end do
    end function
 
-   function number_of_elems(self) result(result)
+   pure function number_of_elems(self) result(result)
       !# Number of elements (boxes) in the stringbuffer.
       !# This is NOT equivalent to the total length!
       class(StringBuffer), intent(in) :: self
@@ -101,7 +101,7 @@ contains
       result = self%size
    end function
 
-   function get_capacity(self) result(result)
+   pure function get_capacity(self) result(result)
       class(StringBuffer), intent(in) :: self
       integer :: result
 
@@ -122,14 +122,14 @@ contains
       end if
    end subroutine
 
-   function is_empty(self) result(result)
+   pure function is_empty(self) result(result)
       class(StringBuffer), intent(in) :: self
       logical :: result
 
       result = (self%size == 0)
    end function
 
-   subroutine append(self, value)
+   pure subroutine append(self, value)
       !# Append a string (in boxed format) to the end.
       class(StringBuffer), intent(inout) :: self
       character(len=*), intent(in) :: value
@@ -169,7 +169,7 @@ contains
       print '(*(g0))', " total length: ", self%total_length()
    end subroutine
 
-   function get_array_size(self) result(result)
+   pure function get_array_size(self) result(result)
       !# Returns the size of the underlying array (that contains the elements).
       class(StringBuffer), intent(in) :: self
       integer :: result
@@ -203,7 +203,7 @@ contains
       self%data(i)%s = value
    end subroutine
 
-   function to_string(self) result(result)
+   pure function to_string(self) result(result)
       !# Get the content of the stringbuffer as a string.
       class(StringBuffer), intent(in) :: self
       character(len=:), allocatable :: result
@@ -232,7 +232,7 @@ contains
    !    end if
    ! end function
 
-   function join(self, sep) result(result)
+   pure function join(self, sep) result(result)
       !# Join the elements by a delimiter.
       !# The result is a string.
       class(StringBuffer), intent(in) :: self
@@ -267,7 +267,7 @@ contains
       end if
    end function
 
-   function equals(self, other) result(result)
+   pure function equals(self, other) result(result)
       !# Check if two stringbuffers have the same content.
       !# Returns true or false.
       class(StringBuffer), intent(in) :: self
@@ -370,7 +370,7 @@ contains
       call result%reverse()
    end function
 
-   function copy(self) result(result)
+   pure function copy(self) result(result)
       !# Creates and returns an independent copy of itself.
       class(StringBuffer), intent(in) :: self
       type(StringBuffer) :: result
@@ -380,7 +380,7 @@ contains
       result%data = self%data
    end function
 
-   function is_sorted(self) result(result)
+   pure function is_sorted(self) result(result)
       !# Checks if the content of the stringbuffer is sorted or not.
       !# Returns true or false.
       class(StringBuffer), intent(in) :: self
@@ -418,7 +418,7 @@ contains
       end if
    end function
 
-   function contains(self, value) result(result)
+   pure function contains(self, value) result(result)
       !# Checks if `value` is in the stringbuffer or not.
       class(StringBuffer), intent(in) :: self
       character(len=*), intent(in) :: value
@@ -487,7 +487,7 @@ contains
       end do
    end function
 
-   function count_elems(self, value) result(result)
+   pure function count_elems(self, value) result(result)
       !# Counts how many times `value` is present in the stringbuffer.
       class(StringBuffer), intent(in) :: self
       character(len=*), intent(in) :: value

@@ -11,7 +11,7 @@ module jconv
 
 contains
 
-   function to_str(n) result(result)
+   pure function to_str(n) result(result)
       !# integer to string (ex.: 25 -> "25")
       integer, intent(in) :: n
       character(len=:), allocatable :: result

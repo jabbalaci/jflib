@@ -63,7 +63,7 @@ module jstring
 
 contains
 
-   function is_in(sub, text) result(result)
+   pure function is_in(sub, text) result(result)
       !# Check if a substring is in a text.
       !# Returns true or false.
       !# Like in Python: if "sub" in "subprogram": ...
@@ -79,7 +79,7 @@ contains
       result = index(text, sub) > 0
    end function
 
-   function find(text, sub) result(result)
+   pure function find(text, sub) result(result)
       !# Find the position of a substring in a string.
       !# Returns 0 if not found.
       character(len=*), intent(in) :: text
@@ -89,7 +89,7 @@ contains
       result = index(text, sub)
    end function
 
-   function rfind(text, sub) result(result)
+   pure function rfind(text, sub) result(result)
       !# Find the *last* position of a substring in a string.
       !# Returns 0 if not found.
       character(len=*), intent(in) :: text
@@ -99,7 +99,7 @@ contains
       result = index(text, sub, back=.true.)
    end function
 
-   function isdigit(s) result(result)
+   pure function isdigit(s) result(result)
       !# Are all the characters digits?
       character(len=*), intent(in) :: s
       logical :: result
@@ -112,7 +112,7 @@ contains
       result = (verify(s, DIGITS) == 0)
    end function
 
-   function isascii(s) result(result)
+   pure function isascii(s) result(result)
       !# Return true if the string is empty or all characters in the string are ASCII,
       !# false otherwise. ASCII characters have code points in the range [0, 127].
       character(len=*), intent(in) :: s
@@ -128,7 +128,7 @@ contains
       result = .true.
    end function
 
-   function isspace(s) result(result)
+   pure function isspace(s) result(result)
       !# Is the string/character a whitespace?
       !# Whitespaces: SPACE, TAB, LF (newline), CR (carriage return)
       character(len=*), intent(in) :: s
@@ -151,7 +151,7 @@ contains
       result = .true.
    end function
 
-   function islower(s) result(result)
+   pure function islower(s) result(result)
       !# Is the string/character lowercased?
       !# It only works with ASCII text.
       character(len=*), intent(in) :: s
@@ -174,7 +174,7 @@ contains
       result = .true.
    end function
 
-   function isupper(s) result(result)
+   pure function isupper(s) result(result)
       !# Is the string/character uppercased?
       !# It only works with ASCII text.
       character(len=*), intent(in) :: s
@@ -197,7 +197,7 @@ contains
       result = .true.
    end function
 
-   function upper(s) result(t)
+   pure function upper(s) result(t)
       !# Returns string `s` in uppercase.
       !# It only works with ASCII text.
       character(len=*), intent(in) :: s
@@ -213,7 +213,7 @@ contains
       end do
    end function
 
-   function lower(s) result(t)
+   pure function lower(s) result(t)
       !# Returns string `s` in lowercase.
       !# It only works with ASCII text.
       character(len=*), intent(in) :: s
@@ -229,7 +229,7 @@ contains
       end do
    end function
 
-   function strip(s, chars) result(result)
+   pure function strip(s, chars) result(result)
       !# Remove leading and trailing whitespaces.
       !# If `chars` not provided, then it defaults to removing whitespace characters.
       character(len=*), intent(in) :: s
@@ -252,7 +252,7 @@ contains
       result = s(left:right)
    end function
 
-   function lstrip(s, chars) result(result)
+   pure function lstrip(s, chars) result(result)
       !# Remove leading whitespaces (from the beginning).
       !# If `chars` not provided, then it defaults to removing whitespace characters.
       character(len=*), intent(in) :: s
@@ -275,7 +275,7 @@ contains
       result = s(left:right)
    end function
 
-   function rstrip(s, chars) result(result)
+   pure function rstrip(s, chars) result(result)
       !# Remove trailing chars (from the end).
       !# If `chars` not provided, then it defaults to removing whitespace characters.
       character(len=*), intent(in) :: s
@@ -298,7 +298,7 @@ contains
       result = s(left:right)
    end function
 
-   function chomp(s) result(result)
+   pure function chomp(s) result(result)
       !# Remove trailing "\r" and "\n" characters (from the end).
       character(len=*), intent(in) :: s
       character(len=:), allocatable :: result
@@ -306,7 +306,7 @@ contains
       result = rstrip(s, CR//LF)
    end function
 
-   function startswith(text, sub) result(result)
+   pure function startswith(text, sub) result(result)
       !# Check if the string starts with a given substring.
       character(len=*), intent(in) :: text
       character(len=*), intent(in) :: sub
@@ -315,7 +315,7 @@ contains
       result = (index(text, sub) == 1)
    end function
 
-   function endswith(text, sub) result(result)
+   pure function endswith(text, sub) result(result)
       !# Check if the string ends with a given substring.
       character(len=*), intent(in) :: text
       character(len=*), intent(in) :: sub
@@ -331,7 +331,7 @@ contains
       result = (pos == len(text) - len(sub) + 1)
    end function
 
-   function replace(s, old, new, count) result(t)
+   pure function replace(s, old, new, count) result(t)
       !# In `s`, replace every occurrence of `old` with `new`.
       !# `count` (optional): number of replaces
       !# Like Python's str.replace()
@@ -374,7 +374,7 @@ contains
       end do
    end function
 
-   function count_elems(s, sub) result(result)
+   pure function count_elems(s, sub) result(result)
       !# In `s`, the substring `sub` is present how many times?
       !# No overlapping. Ex.: in "aaa", "aa" is present just once.
       character(len=*), intent(in) :: s, sub
@@ -448,7 +448,7 @@ contains
       end if
    end function
 
-   function rev(s) result(t)
+   pure function rev(s) result(t)
       !# Returns the reversed string, e.g. "abc" -> "cba"
       !# Works with ASCII only.
       character(len=*), intent(in) :: s
@@ -543,7 +543,7 @@ contains
    !    end if
    ! end function
 
-   function split_with_whitespaces(s) result(sb)  !# private, helper function
+   pure function split_with_whitespaces(s) result(sb)  !# private, helper function
       !# When no delimiter is provided.
       !# Like in Python: result = s.split()
       character(len=*), intent(in) :: s
@@ -629,7 +629,7 @@ contains
       end if
    end function
 
-   function removeprefix(s, prefix) result(result)
+   pure function removeprefix(s, prefix) result(result)
       !# Removes the given prefix from the beginning of `s`.
       !# Returns `s` without the prefix.
       character(len=*), intent(in) :: s
@@ -644,7 +644,7 @@ contains
       result = s(len(prefix) + 1:)
    end function
 
-   function removesuffix(s, suffix) result(result)
+   pure function removesuffix(s, suffix) result(result)
       !# Removes the given suffix from the end of `s`.
       !# Returns `s` without the suffix.
       character(len=*), intent(in) :: s
@@ -659,7 +659,7 @@ contains
       result = s(1:len(s) - len(suffix))
    end function
 
-   function zfill(s, length) result(result)
+   pure function zfill(s, length) result(result)
       character(len=*), intent(in) :: s
       integer, intent(in) :: length
       character(len=:), allocatable :: result
@@ -674,7 +674,7 @@ contains
       result = repeat("0", diff)//s
    end function
 
-   function capitalize(s) result(result)
+   pure function capitalize(s) result(result)
       !# Capitalizes `s`: makes the first letter uppercase, and the rest lowercase.
       character(len=*), intent(in) :: s
       character(len=:), allocatable :: result
@@ -687,7 +687,7 @@ contains
       result = upper(s(1:1))//lower(s(2:))
    end function
 
-   function swapcase(s) result(t)
+   pure function swapcase(s) result(t)
       !# Swaps the case of every character in `s`.
       !# Lowercase becomes uppercase, and vice versa.
       character(len=*), intent(in) :: s
@@ -704,7 +704,7 @@ contains
       end do
    end function
 
-   function equal_strings(s1, s2) result(result)
+   pure function equal_strings(s1, s2) result(result)
       !# Checks if two strings are equal.
       !# "*" == "* " is true in Fortran since the first string will be padded to length 2.
       !# This function also verifies if the strings have the same length.
@@ -743,7 +743,7 @@ contains
       end if
    end function
 
-   function explode(s) result(result)
+   pure function explode(s) result(result)
       !# Converts a string to a list of characters.
       character(len=*), intent(in) :: s
       type(StringBuffer) :: result
