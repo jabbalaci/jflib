@@ -25,12 +25,11 @@ jtypes:
 	fpm run --example example_jtypes
 
 examples:
-	{{call}} jconstants
-	{{call}} jconv
-	{{call}} jstring
-	{{call}} jstringbuffer
-	fpm run --example example_jsys -- aa bb cc dd
-	{{call}} jtypes
+	fpm run --example "*"
+
+examples2:
+	rm -fr ./build
+	fpm run --example "*"
 
 clean:
 	rm -f ./src/*.mod
