@@ -5,6 +5,7 @@ program test_jconv
 
    call test_to_bin()
    call test_to_hex()
+   call test_to_int()
    call test_to_str()
 
    print '(a)', "OK"
@@ -31,6 +32,24 @@ contains
       call assert(to_bin(0) == "0b0")
       call assert(to_bin(42) == "0b101010")
       call assert(to_bin(1) == "0b1")
+   end subroutine
+
+   subroutine test_to_int()
+      integer :: got, iostat
+
+      iostat = 10  !# dummy value
+
+      call assert(to_int("0") == 0)
+      call assert(to_int("42") == 42)
+      call assert(to_int("42", iostat) == 42)
+      call assert(iostat == 0)
+      call assert(to_int("-2026", iostat) == -2026)
+      call assert(iostat == 0)
+      !#
+      got = to_int("test", iostat)
+      call assert(iostat /= 0)
+      got = to_int("", iostat)
+      call assert(iostat /= 0)
    end subroutine
 
 end program
