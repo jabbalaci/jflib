@@ -3,7 +3,7 @@ version = "VERSION"
 license = "MIT"
 author = "Laszlo Szathmary"
 maintainer = "jabba.laci@gmail.com"
-copyright = "Copyright 2026, Laszlo Szathmary alias Jabba Laci"
+copyright = "Copyright 2026, Laszlo Szathmary"
 
 [install]
 library = true
