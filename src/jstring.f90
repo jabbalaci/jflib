@@ -33,6 +33,7 @@ module jstring
    public :: &          !# Python equivalents:
       capitalize, &     !# "anna".capitalize() -> "Anna"
       center, &         !# "*".center(3) -> " * "
+      chomp, &          !# s = s.rstrip("\r\n")
       count_elems, &    !# "Anna".count("n")
       endswith, &       !# "01.png".endswith(".png") -> True
       equal_strings, &  !# same length .and. same content
@@ -262,14 +263,20 @@ contains
       result = s(left:right)
    end function
 
-   function rstrip(s) result(result)
-      !# Remove trailing whitespaces (from the end).
+   function rstrip(s, chars) result(result)
+      !# Remove trailing chars (from the end).
+      !# If `chars` not provided, then it defaults to removing whitespace characters.
       character(len=*), intent(in) :: s
+      character(len=*), intent(in), optional :: chars
+      character(len=:), allocatable :: chars_val
       character(len=:), allocatable :: result
       integer :: left, right
 
+      chars_val = WHITESPACE  !# default value
+      if (present(chars)) chars_val = chars
+
       left = 1
-      right = verify(s, WHITESPACE, back=.true.)
+      right = verify(s, chars_val, back=.true.)
 
       if (right == 0) then
          result = ""
@@ -277,6 +284,14 @@ contains
       end if
 
       result = s(left:right)
+   end function
+
+   function chomp(s) result(result)
+      !# Remove trailing "\r" and "\n" characters (from the end).
+      character(len=*), intent(in) :: s
+      character(len=:), allocatable :: result
+
+      result = rstrip(s, CR//LF)
    end function
 
    function startswith(text, sub) result(result)

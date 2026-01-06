@@ -6,6 +6,7 @@ program example_jstring
 
    print '(*(g0))', 'capitalize("anna"): ', '"', capitalize("anna"), '"'
    print '(*(g0))', 'center("*", 3): ', "'", center("*", 3), "'"
+   print '(*(g0))', 'chomp("line\n"): ', "'", chomp("line"//LF), "'"
    print '(*(g0))', 'count_elems("anna", "n"): ', count_elems("anna", "n")
    print '(*(g0))', 'endswith("01.png", ".png"): ', endswith("01.png", ".png")
    print '(*(g0))', 'equal_strings("*", "* "): ', equal_strings("*", "* ")

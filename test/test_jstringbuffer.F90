@@ -4,32 +4,32 @@ program test_jstringbuffer
    use jconv, only: to_str
    implicit none
 
-   call test_to_string()
-   call test_join()
+   call test_add_to_set()
+   call test_adjust_capacity()
+   call test_capacity()
    call test_clear()
+   call test_contains()
+   call test_copy()
+   call test_count_elems()
    call test_equals()
    call test_get()
-   call test_set()
-   call test_copy()
-   call test_sort()
-   call test_sorted()
-   call test_is_sorted()
-   call test_pop()
    call test_is_empty()
-   call test_contains()
-   call test_add_to_set()
-   call test_capacity()
+   call test_is_sorted()
+   call test_join()
    call test_last()
-   call test_min_elem()
    call test_max_elem()
-   call test_count_elems()
-   call test_swap()
+   call test_min_elem()
+   call test_pop()
    call test_reverse()
    call test_reversed()
    call test_rotate()
-   call test_adjust_capacity()
+   call test_set()
    call test_slice()
    call test_slice_negative()
+   call test_sort()
+   call test_sorted()
+   call test_swap()
+   call test_to_string()
 
    print '(a)', "OK"
 
@@ -172,8 +172,8 @@ contains
       call assert_true(got%equals(expected))
       !#
       call got%clear(); call expected%clear()
-      do i = 1,9
-         call got%append(to_str(10-i))    !# 9, 8, ..., 1
+      do i = 1, 9
+         call got%append(to_str(10 - i))    !# 9, 8, ..., 1
          call expected%append(to_str(i))  !# 1, 2, ..., 9
       end do
       call assert_false(got%equals(expected))

@@ -6,38 +6,39 @@ program test_jstring
    use jstringbuffer, only: StringBuffer
    implicit none
 
-   call test_lower()
-   call test_upper()
-   call test_islower()
-   call test_isupper()
-   call test_isspace()
-   call test_find()
-   call test_rfind()
-   call test_is_in()
-   call test_isdigit()
-   call test_isascii()
-   call test_strip()
-   call test_lstrip()
-   call test_rstrip()
-   call test_startswith()
+   call test_capitalize()
+   call test_center()
+   call test_chomp()
+   call test_count_elems()
    call test_endswith()
+   call test_explode()
+   call test_find()
+   call test_isascii()
+   call test_isdigit()
+   call test_is_in()
+   call test_islower()
+   call test_isspace()
+   call test_isupper()
+   call test_lower()
+   call test_lstrip()
+   ! call test_number_of_tokens_with_delimiter()
+   ! call test_number_of_tokens_with_witespace()
+   call test_removeprefix()
+   call test_removesuffix()
    call test_replace()
    call test_replace_with_count()
    call test_rev()
+   call test_rfind()
+   call test_rstrip()
    call test_slice()
    call test_slice_negative()
-   ! call test_number_of_tokens_with_witespace()
-   ! call test_number_of_tokens_with_delimiter()
-   call test_split_with_witespace()
    call test_split_with_delimiter()
-   call test_removeprefix()
-   call test_removesuffix()
-   call test_zfill()
-   call test_capitalize()
+   call test_split_with_witespace()
+   call test_startswith()
+   call test_strip()
    call test_swapcase()
-   call test_center()
-   call test_count_elems()
-   call test_explode()
+   call test_upper()
+   call test_zfill()
 
    print '(a)', "OK"
 
@@ -203,6 +204,12 @@ contains
       call assert(rstrip("  "//TAB//"  ") == "")
       call assert(rstrip(WHITESPACE) == "")
       call assert(rstrip(WHITESPACE//"a"//WHITESPACE) == WHITESPACE//"a")
+      !# test with chars
+      call assert(rstrip("anna", "na") == "")
+      call assert(rstrip("anna", "an") == "")
+      call assert(rstrip("anna", "ana") == "")
+      call assert(rstrip("01.png", "npg") == "01.")
+      call assert(rstrip("mississippi", "ipz") == "mississ")
    end subroutine
 
    subroutine test_startswith()
@@ -263,9 +270,9 @@ contains
    end subroutine
 
    subroutine test_slice()
-      call assert("abc"(1:1) == "a")
-      call assert("abc"(2:2) == "b")
-      call assert("abc"(3:3) == "c")
+      call assert("abc" (1:1) == "a")
+      call assert("abc" (2:2) == "b")
+      call assert("abc" (3:3) == "c")
       !#
       call assert(slice("abc") == "abc")
       call assert(slice("123456789", 1, 3) == "123")
@@ -657,6 +664,18 @@ contains
       call assert_true(got%equals(expected))
       call assert(got%number_of_elems() == 5)
       !#
+   end subroutine
+
+   subroutine test_chomp()
+      call assert(chomp("line") == "line")
+      call assert(chomp("line"//CR) == "line")
+      call assert(chomp("line"//LF) == "line")
+      call assert(chomp("line"//CR//LF) == "line")
+      call assert(chomp("line"//LF//CR) == "line")
+      call assert(chomp("line"//LF//LF) == "line")
+      call assert(chomp("line"//LF//CR//LF) == "line")
+      call assert(chomp("line"//LF//CR//LF//CR) == "line")
+      call assert(chomp("line"//LF//"x") == "line"//LF//"x")
    end subroutine
 
 end program

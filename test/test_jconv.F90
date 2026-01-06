@@ -3,9 +3,9 @@ program test_jconv
    use jconv
    implicit none
 
-   call test_to_str()
-   call test_to_hex()
    call test_to_bin()
+   call test_to_hex()
+   call test_to_str()
 
    print '(a)', "OK"
 contains
