@@ -229,14 +229,20 @@ contains
       end do
    end function
 
-   function strip(s) result(result)
+   function strip(s, chars) result(result)
       !# Remove leading and trailing whitespaces.
+      !# If `chars` not provided, then it defaults to removing whitespace characters.
       character(len=*), intent(in) :: s
+      character(len=*), intent(in), optional :: chars
+      character(len=:), allocatable :: chars_val
       character(len=:), allocatable :: result
       integer :: left, right
 
-      left = verify(s, WHITESPACE)
-      right = verify(s, WHITESPACE, back=.true.)
+      chars_val = WHITESPACE  !# default value
+      if (present(chars)) chars_val = chars
+
+      left = verify(s, chars_val)
+      right = verify(s, chars_val, back=.true.)
 
       if (left == 0 .or. right == 0) then
          result = ""
@@ -246,13 +252,19 @@ contains
       result = s(left:right)
    end function
 
-   function lstrip(s) result(result)
+   function lstrip(s, chars) result(result)
       !# Remove leading whitespaces (from the beginning).
+      !# If `chars` not provided, then it defaults to removing whitespace characters.
       character(len=*), intent(in) :: s
+      character(len=*), intent(in), optional :: chars
+      character(len=:), allocatable :: chars_val
       character(len=:), allocatable :: result
       integer :: left, right
 
-      left = verify(s, WHITESPACE)
+      chars_val = WHITESPACE  !# default value
+      if (present(chars)) chars_val = chars
+
+      left = verify(s, chars_val)
       right = len(s)
 
       if (left == 0 .or. right == 0) then

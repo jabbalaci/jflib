@@ -174,6 +174,16 @@ contains
       call assert(strip("  "//TAB//"  ") == "")
       call assert(strip(WHITESPACE) == "")
       call assert(strip(WHITESPACE//"a"//WHITESPACE) == "a")
+      !# test with chars
+      call assert(strip("anna", "na") == "")
+      call assert(strip("anna", "an") == "")
+      call assert(strip("anna", "ana") == "")
+      call assert(strip("01.png", "npg") == "01.")
+      call assert(strip("x01.pngx", "xnpgx") == "01.")
+      call assert(strip("01.png", ".10") == "png")
+      call assert(strip("01.png.01", ".10") == "png")
+      call assert(strip("www.example.com", "cmowz.") == "example")
+      call assert_true(equal_strings(strip("  spacious  "), "spacious"))
    end subroutine
 
    subroutine test_lstrip()
@@ -189,6 +199,14 @@ contains
       call assert(lstrip("  "//TAB//"  ") == "")
       call assert(lstrip(WHITESPACE) == "")
       call assert(lstrip(WHITESPACE//"a"//WHITESPACE) == "a"//WHITESPACE)
+      !# test with chars
+      call assert(lstrip("anna", "na") == "")
+      call assert(lstrip("anna", "an") == "")
+      call assert(lstrip("anna", "ana") == "")
+      call assert(lstrip("01.png", "npg") == "01.png")
+      call assert(lstrip("01.png", ".10") == "png")
+      call assert(lstrip("www.example.com", "cmowz.") == "example.com")
+      call assert_true(equal_strings(lstrip("  spacious  "), "spacious  "))
    end subroutine
 
    subroutine test_rstrip()
