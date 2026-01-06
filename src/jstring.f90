@@ -714,12 +714,21 @@ contains
       result = (len(s1) == len(s2)) .and. (s1 == s2)
    end function
 
-   function center(s, width) result(result)
+   function center(s, width, fillchar) result(result)
       !# Centers a string of a given width.
       character(len=*), intent(in) :: s
       integer, intent(in) :: width
+      character(len=*), intent(in), optional :: fillchar
+      character(len=1) :: fillchar_val
       character(len=:), allocatable :: result
       integer :: diff, half
+
+      if (present(fillchar)) then
+         call assert(len(fillchar) == 1, "ValueError: fillchar must be 1 character")
+      end if
+
+      fillchar_val = " "  !# default value: space
+      if (present(fillchar)) fillchar_val = fillchar
 
       if (width <= len(s)) then
          result = s
@@ -728,9 +737,9 @@ contains
       !# else:
       diff = width - len(s)
       half = diff / 2
-      result = repeat(" ", half)//s//repeat(" ", half)
+      result = repeat(fillchar_val, half)//s//repeat(fillchar_val, half)
       if (mod(diff, 2) == 1) then
-         result = result//" "
+         result = result//fillchar_val
       end if
    end function
 

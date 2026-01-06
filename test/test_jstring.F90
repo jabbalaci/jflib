@@ -646,6 +646,13 @@ contains
       call assert_true(equal_strings(center("*", 3), " * "))
       call assert_true(equal_strings(center("*", 4), " *  "))
       call assert_true(equal_strings(center("*", 5), "  *  "))
+      !# test with fillchar
+      call assert_true(equal_strings(center("*", 3, '.'), ".*."))
+      call assert_true(equal_strings(center("Fortran", 7, '.'), "Fortran"))
+      call assert_true(equal_strings(center("Fortran", 11, '-'), "--Fortran--"))
+      call assert_true(equal_strings(center("Fortran", 12, '-'), "--Fortran---"))
+      call assert_true(equal_strings(center("Fortran", 13, '-'), "---Fortran---"))
+      call assert_true(equal_strings(center("Fortran", 13), "   Fortran   "))
    end subroutine
 
    subroutine test_count_elems()
