@@ -1,5 +1,8 @@
 program example_jsys
-   use jsys, only: stdin, stdout, stderr, argc, argv
+   use iso_fortran_env, only: stdin => input_unit, &    !# 5
+                              stdout => output_unit, &  !# 6
+                              stderr => error_unit      !# 0
+   use jsys, only: argc, argv
    implicit none
    integer :: i
 
