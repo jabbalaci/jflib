@@ -31,6 +31,7 @@ module jstringbuffer
          debug, &                   !# print content to stderr
          del, &                     !# delete the element at position `i`
          equals, &                  !# compare with another stringbuffer
+         find, &                    !# find the position of an element
          get, &                     !# get the i^{th} element
          get_array_size, &          !# size of the underlying array (for debug purposes)
          get_capacity, &            !# current capacity
@@ -43,6 +44,7 @@ module jstringbuffer
          min_elem, &                !# get the smallest element
          number_of_elems, &         !# number of appended elements
          pop, &                     !# take out and return the i^{th} element
+         remove, &                  !# remove a given element
          reverse, &                 !# reverse the elements in-place
          reversed, &                !# return a reversed copy
          rotate, &                  !# rotate the elements to the left/right
@@ -622,6 +624,40 @@ contains
             i = i + step_val  !# step is negative, so `i` will be decremented
          end do
       end if
+   end function
+
+   pure function find(self, value) result(idx)
+      !# Find the index position of an element.
+      !# Returns 0 if not found.
+      class(StringBuffer), intent(in) :: self
+      character(len=*), intent(in) :: value
+      integer :: i, idx
+
+      do i = 1, self%size
+         if (self%data(i)%s == value) then
+            idx = i
+            return
+         end if
+      end do
+      idx = 0  !# not found
+   end function
+
+   function remove(self, value) result(found)
+      !# Remove the first occurrence of `value` from the stringbuffer.
+      !# Return true if value was found; return false otherwise.
+      class(StringBuffer), intent(inout) :: self
+      character(len=*), intent(in) :: value
+      logical :: found
+      integer :: i
+
+      i = self%find(value)
+      if (i == 0) then
+         found = .false.
+         return
+      end if
+      !# else, if it was found
+      found = .true.
+      call self%del(i)
    end function
 
 end module jstringbuffer

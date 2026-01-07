@@ -13,6 +13,7 @@ program test_jstringbuffer
    call test_count_elems()
    call test_del()
    call test_equals()
+   call test_find()
    call test_get()
    call test_insert()
    call test_is_empty()
@@ -23,6 +24,7 @@ program test_jstringbuffer
    call test_min_elem()
    call test_pop()
    call test_pop_with_index()
+   call test_remove()
    call test_reverse()
    call test_reversed()
    call test_rotate()
@@ -733,6 +735,47 @@ contains
       call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
       call sb%insert(3, "xx")
       call assert(sb%join(",") == "aa,bb,xx,cc")
+   end subroutine
+
+   subroutine test_find()
+      type(StringBuffer) :: sb
+
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc"); call sb%append("aa")
+      call assert(sb%find("aa") == 1)
+      call assert(sb%find("bb") == 2)
+      call assert(sb%find("cc") == 3)
+      call assert(sb%find("xx") == 0)
+   end subroutine
+
+   subroutine test_remove()
+      type(StringBuffer) :: sb
+      logical :: status
+
+      status = sb%remove("xx")
+      call assert_false(status)
+      !#
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc"); call sb%append("aa")
+      call assert(sb%join(",") == "aa,bb,cc,aa")
+      status = sb%remove("aa")
+      call assert_true(status)
+      call assert(sb%join(",") == "bb,cc,aa")
+      !#
+      status = sb%remove("aa")
+      call assert_true(status)
+      call assert(sb%join(",") == "bb,cc")
+      !#
+      status = sb%remove("aa")
+      call assert_false(status)
+      call assert(sb%join(",") == "bb,cc")
+      !#
+      status = sb%remove("bb")
+      call assert_true(status)
+      call assert(sb%join(",") == "cc")
+      !#
+      status = sb%remove("cc")
+      call assert_true(status)
+      call assert(sb%join(",") == "")
+      call assert_true(sb%is_empty())
    end subroutine
 
 end program
