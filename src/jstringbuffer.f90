@@ -29,10 +29,12 @@ module jstringbuffer
          copy, &                    !# make a complete, independent copy
          count_elems, &             !# a given element is present how many times
          debug, &                   !# print content to stderr
+         del, &                     !# delete the element at position `i`
          equals, &                  !# compare with another stringbuffer
          get, &                     !# get the i^{th} element
          get_array_size, &          !# size of the underlying array (for debug purposes)
          get_capacity, &            !# current capacity
+         insert, &                  !# insert right before the given position
          is_empty, &                !# Is the stringbuffer empty?
          is_sorted, &               !# Is the stringbuffer sorted?
          join, &                    !# join the elements by a delimiter (default delimiter: "")
@@ -70,15 +72,15 @@ contains
 
    subroutine adjust_capacity(self)  !# private
       !# It can happen that the array (self%data) shrinks (remove()) or grows (insert()),
-      !# and thus the arry size becomes different from self%capacity.
+      !# and thus the array size becomes different from self%capacity.
       !# Solution: adjust self%capacity to the current size of the array.
       class(StringBuffer), intent(inout) :: self
 
-      if (self%size == 0) then
-         return
-      end if
-      !# else, if it has at least 1 element
       self%capacity = size(self%data)
+
+      if (self%size == 0) then
+         call self%clear()  !# reset the stringbuffer
+      end if
    end subroutine
 
    pure function total_length(self) result(result)
@@ -153,9 +155,14 @@ contains
       class(StringBuffer), intent(in) :: self
       integer :: i
 
-      do i = 1, self%size
-         print '(*(g0))', i, ": ", "'", self%data(i)%s, "'"
-      end do
+      print '(a)', "debug:"
+      if (self%size == 0) then
+         print *, "(empty)"
+      else
+         do i = 1, self%size
+            print '(x,*(g0))', i, ": ", "'", self%data(i)%s, "'"
+         end do
+      end if
    end subroutine
 
    subroutine stats(self)
@@ -166,7 +173,7 @@ contains
       print '(*(g0))', " number of elems: ", self%size
       print '(*(g0))', " capacity: ", self%capacity
       print '(*(g0))', " size of the underlying array: ", self%get_array_size()
-      print '(*(g0))', " total length: ", self%total_length()
+      print '(*(g0))', " total length of inserted strings: ", self%total_length()
    end subroutine
 
    pure function get_array_size(self) result(result)
@@ -401,22 +408,48 @@ contains
       result = .true.
    end function
 
-   function pop(self) result(result)
-      !# Take out and return the last element of the stringbuffer.
-      !# It modifies the stringbuffer!
-      !# TODO: make it possible to take out any element (using an index)
+   function pop(self, i) result(result)
+      !# Take out (remove) and return the i^{th} element of the stringbuffer.
+      !# If `i` is not provided, then it defaults to the last element.
       class(StringBuffer), intent(inout) :: self
+      integer, intent(in), optional :: i
       character(len=:), allocatable :: result
+      integer :: i_val, last_idx
 
-      call assert(self%size > 0, "Error: the stringbuffer is empty")
+      last_idx = self%size
+      i_val = last_idx  !# default value
+      if (present(i)) i_val = i
 
-      result = self%data(self%size)%s
-      self%data = self%data(1:self%size - 1)
-      self%size = self%size - 1
-      if (self%size == 0) then
-         call self%clear()
-      end if
+      call assert((1 <= i_val) .and. (i_val <= self%size), "IndexError: index out of range")
+
+      result = self%data(i_val)%s
+      call self%del(i_val)
    end function
+
+   subroutine del(self, i)
+      !# Delete the element at position `i`
+      class(StringBuffer), intent(inout) :: self
+      integer, intent(in) :: i
+
+      call assert((1 <= i) .and. (i <= self%size), "IndexError: index out of range")
+
+      self%data = [self%data(1:i - 1), self%data(i + 1:self%size)]
+      self%size = self%size - 1
+      call self%adjust_capacity()  ! Must be called! self%data has changed
+   end subroutine
+
+   subroutine insert(self, i, value)
+      !# Insert `value` right before the `i` position.
+      class(StringBuffer), intent(inout) :: self
+      integer, intent(in) :: i
+      character(len=*), intent(in) :: value
+
+      call assert((1 <= i) .and. (i <= self%size), "IndexError: index out of range")
+
+      self%data = [self%data(1:i - 1), String(value), self%data(i:self%size)]
+      self%size = self%size + 1
+      call self%adjust_capacity()  ! Must be called! self%data has changed
+   end subroutine
 
    pure function contains(self, value) result(result)
       !# Checks if `value` is in the stringbuffer or not.

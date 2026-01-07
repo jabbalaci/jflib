@@ -11,8 +11,10 @@ program test_jstringbuffer
    call test_contains()
    call test_copy()
    call test_count_elems()
+   call test_del()
    call test_equals()
    call test_get()
+   call test_insert()
    call test_is_empty()
    call test_is_sorted()
    call test_join()
@@ -20,6 +22,7 @@ program test_jstringbuffer
    call test_max_elem()
    call test_min_elem()
    call test_pop()
+   call test_pop_with_index()
    call test_reverse()
    call test_reversed()
    call test_rotate()
@@ -237,9 +240,7 @@ contains
       type(StringBuffer) :: sb
       character(len=:), allocatable :: value
 
-      call sb%append("aa")
-      call sb%append("bb")
-      call sb%append("cc")
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
       call assert(sb%number_of_elems() == 3)
       value = sb%pop()
       call assert(value == "cc")
@@ -249,6 +250,37 @@ contains
       call assert(sb%number_of_elems() == 1)
       value = sb%pop()
       call assert(value == "aa")
+      call assert(sb%number_of_elems() == 0)
+   end subroutine
+
+   subroutine test_pop_with_index()
+      type(StringBuffer) :: sb
+      character(len=:), allocatable :: value
+
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call assert(sb%number_of_elems() == 3)
+      value = sb%pop(2)
+      call assert(value == "bb")
+      call assert(sb%number_of_elems() == 2)
+      !#
+      value = sb%pop(1)
+      call assert(value == "aa")
+      call assert(sb%number_of_elems() == 1)
+      !#
+      call sb%append("dd")
+      call assert(sb%join(",") == "cc,dd")
+      value = sb%pop()
+      call assert(value == "dd")
+      call assert(sb%number_of_elems() == 1)
+      !#
+      value = sb%pop(1)
+      call assert(value == "cc")
+      call assert(sb%number_of_elems() == 0)
+      !#
+      call sb%append("xx")
+      call assert(sb%number_of_elems() == 1)
+      value = sb%pop(1)
+      call assert(value == "xx")
       call assert(sb%number_of_elems() == 0)
    end subroutine
 
@@ -654,6 +686,53 @@ contains
       got = sb%slice(step=-1)
       expected = sb%reversed()
       call assert_true(got%equals(expected))
+   end subroutine
+
+   subroutine test_del()
+      type(StringBuffer) :: sb, expected
+
+      call sb%append("aa")
+      call sb%del(1)
+      call assert_true(sb%is_empty())
+      !#
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call sb%del(1)
+      call expected%append("bb"); call expected%append("cc")
+      call assert(sb%number_of_elems() == 2)
+      call assert_true(sb%equals(expected))
+      !#
+      call sb%clear(); call expected%clear()
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call sb%del(2)
+      call expected%append("aa"); call expected%append("cc")
+      call assert(sb%number_of_elems() == 2)
+      call assert_true(sb%equals(expected))
+      !#
+      call sb%clear(); call expected%clear()
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call sb%del(3)
+      call expected%append("aa"); call expected%append("bb")
+      call assert(sb%number_of_elems() == 2)
+      call assert_true(sb%equals(expected))
+   end subroutine
+
+   subroutine test_insert()
+      type(StringBuffer) :: sb
+
+      call sb%clear()
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call sb%insert(1, "xx")
+      call assert(sb%join(",") == "xx,aa,bb,cc")
+      !#
+      call sb%clear()
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call sb%insert(2, "xx")
+      call assert(sb%join(",") == "aa,xx,bb,cc")
+      !#
+      call sb%clear()
+      call sb%append("aa"); call sb%append("bb"); call sb%append("cc")
+      call sb%insert(3, "xx")
+      call assert(sb%join(",") == "aa,bb,xx,cc")
    end subroutine
 
 end program
