@@ -12,6 +12,9 @@ jconstants:
 jconv:
 	fpm run --example example_jconv
 
+jfile:
+	fpm run --example example_jfile
+
 jstring:
 	fpm run --example example_jstring
 
