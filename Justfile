@@ -15,6 +15,9 @@ jconv:
 jfile:
 	fpm run --example example_jfile
 
+jintlist:
+	fpm run --example example_jintlist
+
 jstring:
 	fpm run --example example_jstring
 

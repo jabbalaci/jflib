@@ -102,6 +102,7 @@ contains
       !# This is NOT equivalent to the total length!
       class(StringBuffer), intent(in) :: self
       integer :: result
+
       result = self%size
    end function
 
@@ -153,7 +154,7 @@ contains
    end subroutine
 
    subroutine debug(self)
-      !# Print the content to the stdout. For debug purposes.
+      !# Print the content to stdout. For debug purposes.
       class(StringBuffer), intent(in) :: self
       integer :: i
 
