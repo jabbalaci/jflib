@@ -32,7 +32,9 @@ program test_jstringbuffer
    call test_slice()
    call test_slice_negative()
    call test_sort()
+   call test_sort_with_reverse()
    call test_sorted()
+   call test_sorted_with_reverse()
    call test_swap()
    call test_to_string()
 
@@ -186,6 +188,38 @@ contains
       call assert_true(got%equals(expected))
    end subroutine
 
+   subroutine test_sort_with_reverse()
+      type(StringBuffer) :: got, expected
+      integer :: i
+
+      call assert(got%number_of_elems() == 0)
+      call got%sort(reverse=.true.)
+      call assert(got%number_of_elems() == 0)
+      call got%append("cc")
+      call expected%append("cc")
+      call got%sort(reverse=.true.)
+      call assert_true(got%equals(expected))
+      call got%append("bb")
+      call expected%clear()
+      call expected%append("cc"); call expected%append("bb")
+      call got%sort(reverse=.true.)
+      call assert_true(got%equals(expected))
+      call got%append("aa")
+      call expected%clear()
+      call expected%append("cc"); call expected%append("bb"); call expected%append("aa")
+      call got%sort(reverse=.true.)
+      call assert_true(got%equals(expected))
+      !#
+      call got%clear(); call expected%clear()
+      do i = 1, 9
+         call got%append(to_str(i))             !# 1, 2, ..., 9
+         call expected%append(to_str(10 - i))   !# 9, 8, ..., 1
+      end do
+      call assert_false(got%equals(expected))
+      call got%sort(reverse=.true.)
+      call assert_true(got%equals(expected))
+   end subroutine
+
    subroutine test_copy()
       type(StringBuffer) :: a, copy
 
@@ -207,6 +241,22 @@ contains
       call assert(original%join(",") == "cc,bb,aa")
       copy = original%sorted()
       call assert(original%join(",") == "cc,bb,aa")
+      call assert(copy%join(",") == "aa,bb,cc")
+   end subroutine
+
+   subroutine test_sorted_with_reverse()
+      type(StringBuffer) :: original, copy
+
+      call original%append("bb")
+      call original%append("aa")
+      call original%append("cc")
+      call assert(original%join(",") == "bb,aa,cc")
+      copy = original%sorted(reverse=.true.)
+      call assert(original%join(",") == "bb,aa,cc")
+      call assert(copy%join(",") == "cc,bb,aa")
+      !#
+      copy = original%sorted(reverse=.false.)
+      call assert(original%join(",") == "bb,aa,cc")
       call assert(copy%join(",") == "aa,bb,cc")
    end subroutine
 

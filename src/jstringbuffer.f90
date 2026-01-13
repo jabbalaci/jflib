@@ -334,23 +334,37 @@ contains
       if (i < right) call self%quicksort(i, right)
    end subroutine
 
-   subroutine sort(self)
+   subroutine sort(self, reverse)
       !# sort the underlying array in-place
       class(StringBuffer), intent(inout) :: self
+      logical, intent(in), optional :: reverse
+      logical :: reverse_val
+
+      reverse_val = .false.
+      if (present(reverse)) reverse_val = reverse
+
       if (self%size == 0) then
          return
       end if
       !# else
       call self%quicksort(1, self%size)
+      if (reverse_val) then
+         call self%reverse()
+      end if
    end subroutine
 
-   function sorted(self) result(result)
+   function sorted(self, reverse) result(result)
       !# Returns a sorted copy of itself. The stringbuffer (self) is NOT modified.
       class(StringBuffer), intent(in) :: self
+      logical, intent(in), optional :: reverse
       type(StringBuffer) :: result
+      logical :: reverse_val
+
+      reverse_val = .false.
+      if (present(reverse)) reverse_val = reverse
 
       result = self%copy()
-      call result%sort()
+      call result%sort(reverse_val)
    end function
 
    subroutine reverse(self)
